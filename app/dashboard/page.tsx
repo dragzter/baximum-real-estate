@@ -9,23 +9,18 @@ import { Bot } from "lucide-react";
 export default function Dashboard() {
   return (
     <>
-      {/* Top Navbar */}
       <PageNav />
 
-      {/* Main content split */}
       <div className="flex">
-        {/* Sidebar (Left 1/4) */}
         <div
           id="main-dashboard"
           className="w-1/4 p-6 border-r flex flex-col h-[calc(100vh-84px)] min-w-[400px]"
         >
           <div className="flex flex-col h-full w-full gap-2">
-            {/* Scrollable chat messages */}
             <div
               id="ai-response-container"
               className="flex flex-col-reverse overflow-y-auto flex-1 gap-4 pr-2"
             >
-              {/* Example messages */}
               <div className="p-3 rounded-md bg-muted">
                 <p className="text-sm text-muted-foreground font-semibold">
                   You:
@@ -41,11 +36,8 @@ export default function Dashboard() {
                   So far the most profitable deal is the 24 unit deal.
                 </p>
               </div>
-
-              {/* (You can add more messages here dynamically later) */}
             </div>
 
-            {/* Fixed input at bottom */}
             <Textarea placeholder="Type your message here." className="h-24" />
             <Button
               onClick={() => console.log("have clicked it")}
@@ -57,7 +49,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Right Panel (3/4) */}
         <div
           id={"deals-dashboard"}
           className="w-3/4 p-6 bg-background overflow-y-auto min-w-[350px]"
