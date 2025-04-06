@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { LayoutDashboard, LogOut } from "lucide-react";
+import { LogOut, Upload } from "lucide-react";
 
 export default function PageNav() {
   return (
@@ -14,7 +14,7 @@ export default function PageNav() {
       <div className="space-x-4">
         <Button variant="outline" asChild>
           <Link href="/profile">
-            <LayoutDashboard className="h-4 w-4" /> Dashboard
+            <Upload className="h-4 w-4" /> Upload Deal
           </Link>
         </Button>
         <Button asChild>
