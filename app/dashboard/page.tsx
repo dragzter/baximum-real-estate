@@ -6,17 +6,81 @@ import { Textarea } from "@/components/ui/textarea";
 import PageNav from "@/components/page-nav";
 import { Bot, Check, Copy } from "lucide-react";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { BarChartComponent } from "@/components/bar-chart";
+import { LineChart } from "@/components/line-chart";
+import { PieChartComponent } from "@/components/pie-chart";
+import { SheetDrawer } from "@/components/sheet-drawer";
 
 type Chat = {
   q: string;
   a: string;
 };
 
+type Deal = {
+  id: string;
+  title: string;
+  description: string;
+  investors?: string[];
+};
+
 export default function Dashboard() {
   const [text, setText] = useState("");
   const [chats, setChats] = useState<Chat[]>([]);
   const [copied, setCopied] = useState(false);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
+
+  const deals: Deal[] = useMemo(
+    () => [
+      {
+        title: "55 Unit",
+        id: "55-unit",
+        description: "Property in Concord NH",
+        investors: ["Sam Weissman", "Maggie Oleg", "Terry Baker"],
+      },
+      {
+        title: "64 Units",
+        id: "64-unit",
+        description: "64 unit complex in Rochester",
+        investors: ["Sam Weissman", "Donald Pellham"],
+      },
+      {
+        title: "24 Unit",
+        id: "24-unit",
+        description: "3 8 unit multi-family buildings",
+        investors: ["Todd Brussels", "Bobby Stevenson", "Aaron Berkshire"],
+      },
+      {
+        title: "55 Unit",
+        id: "55-unit-2",
+        description: "Property in Concord NH",
+        investors: ["Sam Weissman", "Maggie Oleg", "Terry Baker"],
+      },
+      {
+        title: "64 Units",
+        id: "64-unit-2",
+        description: "64 unit complex in Rochester",
+        investors: ["Sam Weissman", "Donald Pellham"],
+      },
+      {
+        title: "24 Unit",
+        id: "24-unit-2",
+        description: "3 8 unit multi-family buildings",
+        investors: ["Todd Brussels", "Bobby Stevenson", "Aaron Berkshire"],
+      },
+      {
+        title: "55 Unit",
+        id: "55-unit-3",
+        description: "Property in Concord NH",
+        investors: ["Sam Weissman", "Maggie Oleg", "Terry Baker"],
+      },
+    ],
+    [],
+  );
+
+  const selectedProperty = useMemo(() => {
+    return deals.find((deal) => deal.id === selectedPropertyId);
+  }, [selectedPropertyId, deals]);
 
   const askAi = async (text: string) => {
     try {
@@ -104,28 +168,49 @@ export default function Dashboard() {
           id={"deals-dashboard"}
           className="w-3/4 p-6 bg-background overflow-y-auto min-w-[350px]"
         >
-          <h2 className="mb-5 text-3xl font-bold">My Deals</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className={"text-2xl"}>55 Unit</CardTitle>
-              </CardHeader>
-              <CardContent>Investor 1, Investor 2</CardContent>
-            </Card>
+          <div className="mb-8 flex items-center justify-start gap-4 flex-wrap">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">
+                Selected Property
+              </p>
+              <h2 className="text-3xl font-bold text-foreground">
+                {selectedProperty?.title || "No Selection"}
+              </h2>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className={"text-2xl"}>64 Units</CardTitle>
-              </CardHeader>
-              <CardContent>Some content for card 2.</CardContent>
-            </Card>
+              {selectedProperty?.description && (
+                <p className="text-sm text-muted-foreground">
+                  {selectedProperty.description}
+                </p>
+              )}
+            </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className={"text-2xl"}>24 Unit</CardTitle>
-              </CardHeader>
-              <CardContent>Some content for card 3.</CardContent>
-            </Card>
+            <SheetDrawer buttonText={"Select Property"}>
+              {deals.map((deal) => (
+                <Card
+                  key={deal.id}
+                  onClick={() => setSelectedPropertyId(deal.id)}
+                  className="group cursor-pointer rounded-lg border border-muted bg-background p-3 shadow-sm transition hover:border-primary hover:shadow-md min-w-[220px]"
+                >
+                  <div className="space-y-1">
+                    <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
+                      {deal.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-tight">
+                      {deal.description}
+                    </p>
+                  </div>
+                </Card>
+              ))}
+            </SheetDrawer>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+            {selectedProperty && (
+              <>
+                <LineChart />
+                <PieChartComponent />
+              </>
+            )}
           </div>
         </div>
       </div>
