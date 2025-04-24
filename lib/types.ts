@@ -10,7 +10,7 @@ export type Deal = {
 	units: number;
 	major_capital_event: boolean;
 	estimated_irr?: string;
-	sale_value?: string;
+	sale_price?: string;
 	gross_profit?: string;
 	sale_or_refinance_date?: string;
 	refinance_valuation?: string;

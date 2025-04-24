@@ -1,19 +1,16 @@
 'use client';
 
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import PageNav from '@/components/page-nav';
 import { Bot, Check, Copy } from 'lucide-react';
 import axios from 'axios';
-import { useEffect, useMemo, useState } from 'react';
-import { BarChartComponent } from '@/components/bar-chart';
-import { LineChart } from '@/components/line-chart';
-import { PieChartComponent } from '@/components/pie-chart';
+import { useMemo, useState } from 'react';
 import { SheetDrawer } from '@/components/sheet-drawer';
 import { properties } from '@/lib/data';
 import { Deal } from '@/lib/types';
-import { DataTableDemo, PropertyTable } from '@/components/property-table';
+import { PropertyTable } from '@/components/property-table';
 
 type Chat = {
 	q: string;
@@ -25,6 +22,8 @@ export default function Dashboard() {
 	const [chats, setChats] = useState<Chat[]>([]);
 	const [copied, setCopied] = useState(false);
 	const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
+	const [firstPropertyMessage, setFirstPropertyMessage] = useState(false);
+	const [contentToggle, setPropertyToggle] = useState(false);
 
 	const deals: Deal[] = useMemo(() => {
 		return properties;
@@ -36,10 +35,15 @@ export default function Dashboard() {
 
 	const askAi = async (text: string) => {
 		try {
+			if (!firstPropertyMessage && selectedProperty) {
+				text += `This is the property were discussing: ${selectedProperty?.toString()}`;
+				setFirstPropertyMessage(true);
+			}
+
 			const resp = await axios.post('/api/ai', { data: text });
 			const newChat: Chat = {
 				q: text,
-				a: resp.data.result, // Make sure you match your API response
+				a: resp.data.result,
 			};
 
 			setText('');
@@ -51,7 +55,7 @@ export default function Dashboard() {
 	};
 	return (
 		<>
-			<PageNav />
+			<PageNav toggleHandler={(state: boolean) => setPropertyToggle(state)} />
 
 			<div className="flex">
 				<div
@@ -79,10 +83,6 @@ export default function Dashboard() {
 												navigator.clipboard.writeText(chat.a);
 												setCopied(true); // ✅ Set copied true when clicked
 												setTimeout(() => setCopied(false), 1500); // ✅
-												// Reset
-												// after
-												// 1.5
-												// seconds
 											}}
 											className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity
              text-[10px] px-1.5 py-0.5 rounded-sm bg-gray-200 hover:bg-gray-300 cursor-pointer"
@@ -113,6 +113,7 @@ export default function Dashboard() {
 							onChange={(e) => setText(e?.target?.value || '')}
 						/>
 						<Button
+							disabled={text.trim() === ''}
 							onClick={() => askAi(text)}
 							className="h-12 px-5 text-lg flex items-center gap-2"
 						>
@@ -141,7 +142,7 @@ export default function Dashboard() {
 										Units: {selectedProperty?.units}
 									</span>
 									<span className={'ms-4 pill'}>
-										Capital Event:{' '}
+										Capital Event:
 										{selectedProperty?.major_capital_event ? 'Yes' : 'No'}
 									</span>
 								</p>
@@ -173,56 +174,59 @@ export default function Dashboard() {
 							))}
 						</SheetDrawer>
 					</div>
-
-					<div className="grid grid-cols-6 md:grid-cols-6 gap-6 mt-8">
-						<div>
-							Purchase Date:
-							<br /> {selectedProperty?.purchase_date ?? 'N/A'}
+					{!contentToggle && (
+						<div className="grid grid-cols-6 md:grid-cols-6 gap-6 mt-8">
+							<div>
+								Purchase Date:
+								<br /> {selectedProperty?.purchase_date ?? 'N/A'}
+							</div>
+							<div>
+								Down Payment: <br />
+								{selectedProperty?.down_payment_reserves ?? 'N/A'}
+							</div>
+							<div>
+								Sale: <br />
+								{selectedProperty?.sale_price ?? 'N/A'}
+							</div>
+							<div>
+								Gross Profit: <br />
+								{selectedProperty?.gross_profit ?? 'N/A'}
+							</div>
+							<div>
+								Unstabilized Income: <br />
+								{selectedProperty?.unstabilized_projected_income ?? 'N/A'}
+							</div>
+							<div>
+								Realized Income: <br />
+								{selectedProperty?.current_realized_income ?? 'N/A'}
+							</div>
+							<div>
+								Total Est. Value: <br />
+								{selectedProperty?.estimated_value ?? 'N/A'}
+							</div>
+							<div>
+								Refinance Valuation: <br />
+								{selectedProperty?.refinance_valuation ?? 'N/A'}
+							</div>
+							<div>
+								Rent Increase %: <br />
+								{selectedProperty?.rent_increase_percent ?? 'N/A'}
+							</div>
+							<div>
+								Capital Event Date : <br />
+								{selectedProperty?.sale_or_refinance_date ?? 'N/A'}
+							</div>
+							<div>
+								Estimated IRR: <br />
+								{selectedProperty?.estimated_irr ?? 'N/A'}
+							</div>
 						</div>
-						<div>
-							Down Payment: <br />
-							{selectedProperty?.down_payment_reserves ?? 'N/A'}
+					)}
+					{contentToggle && (
+						<div className="grid grid-cols-4 md:grid-cols-1 gap-6 mt-8">
+							<PropertyTable />
 						</div>
-						<div>
-							Sale: <br />
-							{selectedProperty?.sale_value ?? 'N/A'}
-						</div>
-						<div>
-							Gross Profit: <br />
-							{selectedProperty?.gross_profit ?? 'N/A'}
-						</div>
-						<div>
-							Unstabilized Income: <br />
-							{selectedProperty?.unstabilized_projected_income ?? 'N/A'}
-						</div>
-						<div>
-							Realized Income: <br />
-							{selectedProperty?.current_realized_income ?? 'N/A'}
-						</div>
-						<div>
-							Total Est. Value: <br />
-							{selectedProperty?.estimated_value ?? 'N/A'}
-						</div>
-						<div>
-							Refinance Valuation: <br />
-							{selectedProperty?.refinance_valuation ?? 'N/A'}
-						</div>
-						<div>
-							Rent Increase %: <br />
-							{selectedProperty?.rent_increase_percent ?? 'N/A'}
-						</div>
-						<div>
-							Capital Event Date : <br />
-							{selectedProperty?.sale_or_refinance_date ?? 'N/A'}
-						</div>
-						<div>
-							Estimated IRR: <br />
-							{selectedProperty?.estimated_irr ?? 'N/A'}
-						</div>
-					</div>
-					<div className="grid grid-cols-4 md:grid-cols-1 gap-6 mt-8">
-						<PropertyTable />
-					</div>
+					)}
 				</div>
 			</div>
 		</>
