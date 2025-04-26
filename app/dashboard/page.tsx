@@ -36,7 +36,7 @@ export default function Dashboard() {
 	const askAi = async (text: string) => {
 		try {
 			if (!firstPropertyMessage && selectedProperty) {
-				text += `This is the property were discussing: ${selectedProperty?.toString()}`;
+				text += `This is the relevant property: ${selectedProperty?.toString()}`;
 				setFirstPropertyMessage(true);
 			}
 

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { House, Radar, LogOut, Upload } from 'lucide-react';
 
-export default function PageNav({ toggleHandler }) {
+export default function PageNav({ toggleHandler }: { toggleHandler: (s: boolean) => void }) {
 	return (
 		<nav className="border-b px-6 py-4 flex items-center justify-between bg-background">
 			<div className="text-2xl font-bold">
