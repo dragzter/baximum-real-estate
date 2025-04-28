@@ -55,7 +55,7 @@ export default function Dashboard() {
 	};
 	return (
 		<>
-			<PageNav toggleHandler={(state: boolean) => setPropertyToggle(state)} />
+			<PageNav onClick={(state: boolean) => setPropertyToggle(state)} />
 
 			<div className="flex">
 				<div

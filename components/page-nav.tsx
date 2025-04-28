@@ -1,9 +1,15 @@
+'use client';
+
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { House, Radar, LogOut, Upload } from 'lucide-react';
 
-export default function PageNav({ toggleHandler }: { toggleHandler: (s: boolean) => void }) {
+export default function PageNav({ onClick }) {
+	const handleClick = (b) => {
+		onClick(b);
+	};
+
 	return (
 		<nav className="border-b px-6 py-4 flex items-center justify-between bg-background">
 			<div className="text-2xl font-bold">
@@ -12,10 +18,10 @@ export default function PageNav({ toggleHandler }: { toggleHandler: (s: boolean)
 				</Link>
 			</div>
 			<div className="space-x-4">
-				<Button variant="outline" onClick={() => toggleHandler(false)}>
+				<Button variant="outline" onClick={() => handleClick(false)}>
 					<Radar className="h-4 w-4" /> Dashboard
 				</Button>
-				<Button variant="outline" onClick={() => toggleHandler(true)}>
+				<Button variant="outline" onClick={() => handleClick(true)}>
 					<House className="h-4 w-4" /> Deals List
 				</Button>
 				<Button variant="outline" asChild>
