@@ -30,3 +30,5 @@ export const DATA_KEYS = {
 	major_capital_event: 'Major Capital Event Already Executed',
 	estimated_irr: 'Estimated IRR (Not Including Distributions)',
 };
+
+export const ADMIN_LIST = process.env.NEXT_PUBLIC_ADMIN_LIST?.split(',');

@@ -23,3 +23,24 @@ export type Investor = {
 	email: string;
 	phone: string;
 };
+
+export interface BaxUser {
+	sid?: string;
+	sub: string;
+	name: string;
+	nickname: string;
+	picture: string;
+	email: string;
+	id: string;
+	isAdmin: boolean;
+	createdAt?: string;
+	properties: string[];
+}
+
+// Response Types
+export interface ApiResponse<T> {
+	error?: string | Error;
+	message?: string;
+	data?: T;
+	success: boolean;
+}

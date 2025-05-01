@@ -6,11 +6,13 @@ import { Textarea } from '@/components/ui/textarea';
 import PageNav from '@/components/page-nav';
 import { Bot, Check, Copy } from 'lucide-react';
 import axios from 'axios';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { SheetDrawer } from '@/components/sheet-drawer';
 import { properties } from '@/lib/data';
 import { Deal } from '@/lib/types';
 import { PropertyTable } from '@/components/property-table';
+import { useUser } from '@auth0/nextjs-auth0/client';
+import { useGeneralAppStateStore, useUserStore } from '@/lib/store';
 
 type Chat = {
 	q: string;
@@ -23,11 +25,21 @@ export default function Dashboard() {
 	const [copied, setCopied] = useState(false);
 	const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
 	const [firstPropertyMessage, setFirstPropertyMessage] = useState(false);
-	const [contentToggle, setPropertyToggle] = useState(false);
+	const { user } = useUser();
+	const getUser = useUserStore((s) => s.getUser);
+	const isDashBoard = useGeneralAppStateStore((s) => s.isDashboard);
 
 	const deals: Deal[] = useMemo(() => {
 		return properties;
 	}, []);
+
+	useEffect(() => {
+		if (user?.sub) {
+			(async () => {
+				await getUser(encodeURIComponent(user.sub as string));
+			})();
+		}
+	}, [user, getUser]);
 
 	const selectedProperty = useMemo(() => {
 		return deals.find((deal) => deal.id === selectedPropertyId);
@@ -55,7 +67,7 @@ export default function Dashboard() {
 	};
 	return (
 		<>
-			<PageNav onClick={(state: boolean) => setPropertyToggle(state)} />
+			<PageNav />
 
 			<div className="flex">
 				<div
@@ -174,7 +186,7 @@ export default function Dashboard() {
 							))}
 						</SheetDrawer>
 					</div>
-					{!contentToggle && (
+					{isDashBoard && (
 						<div className="grid grid-cols-6 md:grid-cols-6 gap-6 mt-8">
 							<div>
 								Purchase Date:
@@ -222,7 +234,7 @@ export default function Dashboard() {
 							</div>
 						</div>
 					)}
-					{contentToggle && (
+					{!isDashBoard && (
 						<div className="grid grid-cols-4 md:grid-cols-1 gap-6 mt-8">
 							<PropertyTable />
 						</div>
