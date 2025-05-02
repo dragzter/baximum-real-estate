@@ -34,12 +34,26 @@ export default function Dashboard() {
 		return properties; // this is a placeholder, there will be filtering here
 	}, []);
 
+	const handleKeyDown = async (event: Event, text: string) => {
+		if (
+			(event as KeyboardEvent)?.key === 'Enter' &&
+			!(event as KeyboardEvent)?.shiftKey &&
+			!loading &&
+			text.trim()
+		) {
+			await askAi(text);
+		} else {
+			return;
+		}
+	};
+
 	useEffect(() => {
 		if (user?.sub) {
 			(async () => {
 				await getUser(encodeURIComponent(user.sub as string));
 			})();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user, getUser]);
 
 	const selectedProperty = useMemo(() => {
@@ -138,10 +152,10 @@ export default function Dashboard() {
 								Querying All Properties
 							</p>
 						)}
-
 						<Textarea
 							placeholder="Type your message here."
 							className="h-24"
+							onKeyDown={(event) => handleKeyDown(event as never, text)}
 							value={text}
 							onChange={(e) => setText(e?.target?.value || '')}
 						/>

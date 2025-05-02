@@ -6,7 +6,7 @@ import { PropertyTable } from '@/components/property-table';
 export default function Deals() {
 	return (
 		<>
-			<PageNav onClick={() => null} />
+			<PageNav />
 			<div
 				id="properties-list"
 				className="p-6 flex flex-col h-[calc(100vh-84px)] min-w-[400px]"

@@ -6,8 +6,6 @@ export async function POST(req: NextRequest) {
 	try {
 		const { user } = await req.json();
 
-		console.log('user: ', user);
-
 		const response = await userController().save(user);
 
 		return NextResponse.json({ response });

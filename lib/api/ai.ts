@@ -119,10 +119,6 @@ export class AiController {
 		this.maxMemorySlots = 22;
 	}
 
-	// addFact(key: string, value: string) {
-	//   this.importantFacts.push({ key, value });
-	// }
-
 	async summarize(userPrompt: Message) {
 		this.memory.push(userPrompt);
 		this.memory = this.memory.slice(-this.maxMemorySlots);

@@ -82,7 +82,7 @@ export function userController() {
 	async function g(id: string): Promise<BaxUser | null> {
 		await _c();
 
-		return (await UserModel.findOne({ id }).lean().exec()) as BaxUser | null;
+		return (await UserModel.findOne({ id }).lean().exec()) as unknown as BaxUser | null;
 	}
 
 	return {
