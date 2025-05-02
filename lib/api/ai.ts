@@ -147,6 +147,28 @@ export class AiController {
 		this.summary = summaryResponse.choices[0]?.message?.content || '';
 	}
 
+	async ask2(userPrompt: string): Promise<string> {
+		const messages: Message[] = [
+			{
+				role: 'system',
+				content: `
+          You're a helpful real estate professional that examines real estate for a living and is able to provide helpful advice. Be very brief in your responses only giving essential info.
+      `.trim(),
+			},
+			{
+				role: 'user',
+				content: userPrompt,
+			},
+		];
+
+		const response = await this.openai.chat.completions.create({
+			model: this.model,
+			messages,
+		});
+
+		return response.choices[0]?.message?.content || '';
+	}
+
 	async ask(userPrompt: string): Promise<string> {
 		await this.summarize({ role: 'user', content: userPrompt });
 

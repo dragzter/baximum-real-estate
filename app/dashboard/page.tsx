@@ -13,6 +13,7 @@ import { Deal } from '@/lib/types';
 import { PropertyTable } from '@/components/property-table';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useGeneralAppStateStore, useUserStore } from '@/lib/store';
+import { Loader2 } from 'lucide-react';
 
 type Chat = {
 	q: string;
@@ -21,16 +22,16 @@ type Chat = {
 
 export default function Dashboard() {
 	const [text, setText] = useState('');
+	const [loading, setLoading] = useState(false);
 	const [chats, setChats] = useState<Chat[]>([]);
 	const [copied, setCopied] = useState(false);
 	const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
-	const [firstPropertyMessage, setFirstPropertyMessage] = useState(false);
 	const { user } = useUser();
 	const getUser = useUserStore((s) => s.getUser);
 	const isDashBoard = useGeneralAppStateStore((s) => s.isDashboard);
 
 	const deals: Deal[] = useMemo(() => {
-		return properties;
+		return properties; // this is a placeholder, there will be filtering here
 	}, []);
 
 	useEffect(() => {
@@ -45,14 +46,25 @@ export default function Dashboard() {
 		return deals.find((deal) => deal.id === selectedPropertyId);
 	}, [selectedPropertyId, deals]);
 
+	const selectProperty = (deal: Deal) => {
+		setSelectedPropertyId(deal.id);
+		console.log('setting property');
+	};
+
 	const askAi = async (text: string) => {
 		try {
-			if (!firstPropertyMessage && selectedProperty) {
-				text += `This is the relevant property: ${selectedProperty?.toString()}`;
-				setFirstPropertyMessage(true);
+			setLoading(true);
+			const payload: { data: string; supporting?: undefined | Deal; isDashBoard: boolean } = {
+				data: text,
+				supporting: undefined,
+				isDashBoard,
+			};
+
+			if (selectedProperty && isDashBoard) {
+				payload.supporting = selectedProperty;
 			}
 
-			const resp = await axios.post('/api/ai', { data: text });
+			const resp = await axios.post('/api/ai', payload);
 			const newChat: Chat = {
 				q: text,
 				a: resp.data.result,
@@ -61,6 +73,8 @@ export default function Dashboard() {
 			setText('');
 
 			setChats((prevChats) => [newChat, ...prevChats]);
+
+			setLoading(false);
 		} catch (err) {
 			console.log(err);
 		}
@@ -113,11 +127,18 @@ export default function Dashboard() {
 							))}
 						</div>
 
-						{selectedProperty && (
+						{selectedProperty && isDashBoard && (
 							<p className="bg-purple-50 text-teal-700 px-4 py-2 rounded-md border">
 								Asking about: {selectedProperty?.address}
 							</p>
 						)}
+
+						{!isDashBoard && (
+							<p className="bg-purple-50 text-teal-700 px-4 py-2 rounded-md border">
+								Querying All Properties
+							</p>
+						)}
+
 						<Textarea
 							placeholder="Type your message here."
 							className="h-24"
@@ -125,11 +146,12 @@ export default function Dashboard() {
 							onChange={(e) => setText(e?.target?.value || '')}
 						/>
 						<Button
-							disabled={text.trim() === ''}
+							disabled={text.trim() === '' || loading}
 							onClick={() => askAi(text)}
-							className="h-12 px-5 text-lg flex items-center gap-2"
+							className="h-12 px-5 text-lg flex items-center cursor-pointer gap-2"
 						>
-							<Bot className="h-5 w-5" />
+							{loading && <Loader2 className="animate-spin" />}
+							{!loading && <Bot className="h-5 w-5" />}
 							Ask Question
 						</Button>
 					</div>
@@ -165,7 +187,7 @@ export default function Dashboard() {
 							{deals.map((deal) => (
 								<Card
 									key={deal.id}
-									onClick={() => setSelectedPropertyId(deal.id)}
+									onClick={() => selectProperty(deal)}
 									className="group cursor-pointer rounded-lg border border-muted bg-background p-3 shadow-sm transition hover:border-primary hover:shadow-md min-w-[220px]"
 								>
 									<div className="space-y-1">
@@ -186,7 +208,7 @@ export default function Dashboard() {
 							))}
 						</SheetDrawer>
 					</div>
-					{isDashBoard && (
+					{isDashBoard && selectedProperty && (
 						<div className="grid grid-cols-6 md:grid-cols-6 gap-6 mt-8">
 							<div>
 								Purchase Date:

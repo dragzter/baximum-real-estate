@@ -17,11 +17,12 @@ import Link from 'next/link';
 export function NavMenuDropdown() {
 	const _user = useUserStore((s) => s.user);
 	const setDashboardView = useGeneralAppStateStore((s) => s.setIsDashboard);
+	const isDashbaord = useGeneralAppStateStore((s) => s.isDashboard);
 
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button variant="outline">
+				<Button style={{ cursor: 'pointer' }} variant="outline">
 					<User /> {_user.name}
 				</Button>
 			</DropdownMenuTrigger>
@@ -31,11 +32,18 @@ export function NavMenuDropdown() {
 				<DropdownMenuSeparator />
 
 				<DropdownMenuGroup>
-					<DropdownMenuItem onClick={() => setDashboardView(false)}>
-						<House className="h-4 w-4" /> Deals List
+					<DropdownMenuItem
+						style={{ cursor: 'pointer' }}
+						onClick={() => setDashboardView(false)}
+					>
+						<House className={`h-4 w-4 ${!isDashbaord && 'link-active'}`} /> All
+						Properties
 					</DropdownMenuItem>
-					<DropdownMenuItem onClick={() => setDashboardView(true)}>
-						<Radar className="h-4 w-4" /> Dashboard
+					<DropdownMenuItem
+						style={{ cursor: 'pointer' }}
+						onClick={() => setDashboardView(true)}
+					>
+						<Radar className={`h-4 w-4 ${isDashbaord ?? 'link-active'}`} /> Dashboard
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
 
