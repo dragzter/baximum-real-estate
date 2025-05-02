@@ -53,7 +53,6 @@ export default function Dashboard() {
 				await getUser(encodeURIComponent(user.sub as string));
 			})();
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user, getUser]);
 
 	const selectedProperty = useMemo(() => {

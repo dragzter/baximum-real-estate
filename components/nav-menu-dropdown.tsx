@@ -23,7 +23,7 @@ export function NavMenuDropdown() {
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button style={{ cursor: 'pointer' }} variant="outline">
-					<User /> {_user.name}
+					<User /> {_user?.name ? _user.name : 'User'}
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-56">
