@@ -14,6 +14,8 @@ import { PropertyTable } from '@/components/property-table';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useGeneralAppStateStore, useUserStore } from '@/lib/store';
 import { Loader2 } from 'lucide-react';
+import { VIEWS } from '@/lib/utils';
+import AddProperty from '@/components/add-property';
 
 type Chat = {
 	q: string;
@@ -28,7 +30,8 @@ export default function Dashboard() {
 	const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
 	const { user } = useUser();
 	const getUser = useUserStore((s) => s.getUser);
-	const isDashBoard = useGeneralAppStateStore((s) => s.isDashboard);
+	const view = useGeneralAppStateStore((s) => s.view);
+	const isDashBoard = view === VIEWS.dashboard;
 
 	const deals: Deal[] = useMemo(() => {
 		return properties; // this is a placeholder, there will be filtering here
@@ -67,13 +70,14 @@ export default function Dashboard() {
 	const askAi = async (text: string) => {
 		try {
 			setLoading(true);
+
 			const payload: { data: string; supporting?: undefined | Deal; isDashBoard: boolean } = {
 				data: text,
 				supporting: undefined,
 				isDashBoard,
 			};
 
-			if (selectedProperty && isDashBoard) {
+			if (selectedProperty && !isDashBoard) {
 				payload.supporting = selectedProperty;
 			}
 
@@ -84,9 +88,7 @@ export default function Dashboard() {
 			};
 
 			setText('');
-
 			setChats((prevChats) => [newChat, ...prevChats]);
-
 			setLoading(false);
 		} catch (err) {
 			console.log(err);
@@ -172,56 +174,62 @@ export default function Dashboard() {
 
 				<div
 					id={'deals-dashboard'}
-					className="w-3/4 p-6 bg-background overflow-y-auto min-w-[350px]"
+					className="w-3/4 p-6 bg-background h-[calc(100vh-84px)] overflow-y-auto min-w-[350px]"
 				>
 					<div className="mb-8 flex items-center justify-start gap-4 flex-wrap">
-						<div>
-							<p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">
-								Selected Property
-							</p>
-							<h2 className="text-3xl font-bold text-foreground">
-								{selectedProperty?.address || 'No Selection'}
-							</h2>
-							{selectedProperty?.purchase_price && (
-								<p className="text-sm text-muted-foreground mt-4">
-									Purchase Price: {selectedProperty.purchase_price}
-									<span className={'ms-4 pill'}>
-										Units: {selectedProperty?.units}
-									</span>
-									<span className={'ms-4 pill'}>
-										Capital Event:
-										{selectedProperty?.major_capital_event ? 'Yes' : 'No'}
-									</span>
+						{view === VIEWS.dashboard && (
+							<div>
+								<p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">
+									Selected Property
 								</p>
-							)}
-						</div>
+								<h2 className="text-3xl font-bold text-foreground">
+									{selectedProperty?.address || 'No Selection'}
+								</h2>
+								{selectedProperty?.purchase_price && (
+									<p className="text-sm text-muted-foreground mt-4">
+										Purchase Price: {selectedProperty.purchase_price}
+										<span className={'ms-4 pill'}>
+											Units: {selectedProperty?.units}
+										</span>
+										<span className={'ms-4 pill'}>
+											Capital Event:
+											{selectedProperty?.major_capital_event ? 'Yes' : 'No'}
+										</span>
+									</p>
+								)}
+							</div>
+						)}
 
-						<SheetDrawer buttonText={'Select Property'}>
-							{deals.map((deal) => (
-								<Card
-									key={deal.id}
-									onClick={() => selectProperty(deal)}
-									className="group cursor-pointer rounded-lg border border-muted bg-background p-3 shadow-sm transition hover:border-primary hover:shadow-md min-w-[220px]"
-								>
-									<div className="space-y-1">
-										<h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
-											{deal.address}
-										</h3>
-										<p className="text-sm  font-bold leading-tight">
-											<span className={'text-muted-foreground font-normal'}>
-												Sale Price:
-											</span>
-											<span> {deal.purchase_price}</span>
-										</p>
-										<p className="text-sm text-muted-foreground leading-tight">
-											Units: {deal.units}
-										</p>
-									</div>
-								</Card>
-							))}
-						</SheetDrawer>
+						{view === VIEWS.dashboard && (
+							<SheetDrawer buttonText={'Select Property'}>
+								{deals.map((deal) => (
+									<Card
+										key={deal.id}
+										onClick={() => selectProperty(deal)}
+										className="group cursor-pointer rounded-lg border border-muted bg-background p-3 shadow-sm transition hover:border-primary hover:shadow-md min-w-[220px]"
+									>
+										<div className="space-y-1">
+											<h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
+												{deal.address}
+											</h3>
+											<p className="text-sm  font-bold leading-tight">
+												<span
+													className={'text-muted-foreground font-normal'}
+												>
+													Sale Price:
+												</span>
+												<span> {deal.purchase_price}</span>
+											</p>
+											<p className="text-sm text-muted-foreground leading-tight">
+												Units: {deal.units}
+											</p>
+										</div>
+									</Card>
+								))}
+							</SheetDrawer>
+						)}
 					</div>
-					{isDashBoard && selectedProperty && (
+					{view === VIEWS.dashboard && selectedProperty && (
 						<div className="grid grid-cols-6 md:grid-cols-6 gap-6 mt-8">
 							<div>
 								Purchase Date:
@@ -269,9 +277,16 @@ export default function Dashboard() {
 							</div>
 						</div>
 					)}
-					{!isDashBoard && (
+					{view === VIEWS.property_list && (
 						<div className="grid grid-cols-4 md:grid-cols-1 gap-6 mt-8">
+							<h2 className={'font-bold text-gray-900 sm:truncate'}>Property List</h2>
 							<PropertyTable />
+						</div>
+					)}
+					{view === VIEWS.add_property && (
+						<div className="grid grid-cols-12 md:grid-cols-1 gap-4 mt-2">
+							<h2 className={'font-bold text-gray-900 sm:truncate'}>Add Property</h2>
+							<AddProperty />
 						</div>
 					)}
 				</div>

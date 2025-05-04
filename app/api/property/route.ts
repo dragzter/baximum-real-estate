@@ -7,14 +7,6 @@ const ai = new AiController();
 export async function POST(req: NextRequest) {
 	try {
 		const { data, isDashBoard, supporting } = await req.json();
-		let aiPrompt = '';
-
-		if (isDashBoard && supporting) {
-			aiPrompt = data + ` - We are discussing this property: ${JSON.stringify(supporting)}`;
-		} else {
-			aiPrompt =
-				data + `- Here is a list of all the properties: ${JSON.stringify(properties)}`;
-		}
 
 		const aiResponse = await ai.ask2(aiPrompt);
 

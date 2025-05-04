@@ -91,8 +91,8 @@ export const columns: ColumnDef<Deal>[] = [
 		cell: ({ row }) => new Date(row.getValue('purchase_date')).toLocaleDateString(),
 	},
 	{
-		header: 'Sale Value',
-		accessorKey: 'sale_value',
+		header: 'Sale Price',
+		accessorKey: 'sale_price',
 	},
 	{
 		header: 'Gross Profit',

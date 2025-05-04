@@ -10,20 +10,29 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { House, LogOut, Radar, User } from 'lucide-react';
+import { House, Loader2, LogOut, Plus, Radar, User } from 'lucide-react';
 import { useGeneralAppStateStore, useUserStore } from '@/lib/store';
 import Link from 'next/link';
+import { VIEWS } from '@/lib/utils';
 
 export function NavMenuDropdown() {
 	const _user = useUserStore((s) => s.user);
-	const setDashboardView = useGeneralAppStateStore((s) => s.setIsDashboard);
-	const isDashbaord = useGeneralAppStateStore((s) => s.isDashboard);
+	const loading = useUserStore((s) => s.loading);
+	const setView = useGeneralAppStateStore((s) => s.setView);
+	// const view = useGeneralAppStateStore((s) => s.view);
 
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button style={{ cursor: 'pointer' }} variant="outline">
-					<User /> {_user?.name ? _user.name : 'User'}
+					{loading || !_user ? (
+						<Loader2 className="animate-spin" />
+					) : (
+						<>
+							<User />
+							{_user?.name || 'User'}
+						</>
+					)}
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-56">
@@ -34,16 +43,21 @@ export function NavMenuDropdown() {
 				<DropdownMenuGroup>
 					<DropdownMenuItem
 						style={{ cursor: 'pointer' }}
-						onClick={() => setDashboardView(false)}
+						onClick={() => setView(VIEWS.property_list)}
 					>
-						<House className={`h-4 w-4 ${!isDashbaord && 'link-active'}`} /> All
-						Properties
+						<House className={`h-4 w-4`} /> All Properties
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						style={{ cursor: 'pointer' }}
-						onClick={() => setDashboardView(true)}
+						onClick={() => setView(VIEWS.dashboard)}
 					>
-						<Radar className={`h-4 w-4 ${isDashbaord ?? 'link-active'}`} /> Dashboard
+						<Radar className={`h-4 w-4`} /> Dashboard
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						style={{ cursor: 'pointer' }}
+						onClick={() => setView(VIEWS.add_property)}
+					>
+						<Plus /> Add Property
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
 

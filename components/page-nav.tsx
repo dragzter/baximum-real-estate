@@ -9,7 +9,7 @@ export default function PageNav() {
 		<nav className="border-b px-6 py-4 flex items-center justify-between bg-background">
 			<div className="text-2xl font-bold">
 				<Link href={'/'} className="flex items-center gap-2">
-					<Image src={'/bax_logo.png'} width={130} height={0} alt={'logo'} />
+					<Image src={'/bax_logo.png'} priority width={130} height={0} alt={'logo'} />
 				</Link>
 			</div>
 

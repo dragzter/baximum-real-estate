@@ -107,7 +107,7 @@ export class AiController {
 		this.openai = new OpenAI({
 			apiKey: process.env.OPEN_AI_API_KEY!,
 		});
-		this.model = options.model || 'gpt-4';
+		this.model = options.model || 'gpt-3.5-turbo';
 
 		this.systemMessage = {
 			role: 'system',
@@ -161,6 +161,8 @@ export class AiController {
 			model: this.model,
 			messages,
 		});
+
+		console.log(messages);
 
 		return response.choices[0]?.message?.content || '';
 	}

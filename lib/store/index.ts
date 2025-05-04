@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { BaxUser } from '@/lib/types';
 import axios from 'axios';
+import { VIEWS } from '@/lib/utils';
 
 interface UserState {
 	user: BaxUser;
@@ -12,6 +13,8 @@ interface UserState {
 interface GeneralState {
 	isDashboard: boolean;
 	setIsDashboard: (b: boolean) => void;
+	view: (typeof VIEWS)[keyof typeof VIEWS];
+	setView: (s: (typeof VIEWS)[keyof typeof VIEWS]) => void;
 }
 
 export const useUserStore = create<UserState>((set) => ({
@@ -23,7 +26,7 @@ export const useUserStore = create<UserState>((set) => ({
 			set({ loading: true });
 			const resp = await axios.get(`/api/login/${id}`);
 
-			set({ user: resp?.data.response, loading: false });
+			set({ user: resp?.data, loading: false });
 		} catch (err) {
 			console.log(err);
 		}
@@ -32,5 +35,7 @@ export const useUserStore = create<UserState>((set) => ({
 
 export const useGeneralAppStateStore = create<GeneralState>((set) => ({
 	isDashboard: false,
+	view: VIEWS.property_list,
 	setIsDashboard: (s: boolean) => set({ isDashboard: s }),
+	setView: (s: (typeof VIEWS)[keyof typeof VIEWS]) => set({ view: s }),
 }));

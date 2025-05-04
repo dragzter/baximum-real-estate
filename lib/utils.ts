@@ -31,4 +31,10 @@ export const DATA_KEYS = {
 	estimated_irr: 'Estimated IRR (Not Including Distributions)',
 };
 
+export const VIEWS = {
+	dashboard: 'dashboard',
+	property_list: 'property_list',
+	add_property: 'add_property',
+};
+
 export const ADMIN_LIST = process.env.NEXT_PUBLIC_ADMIN_LIST?.split(',');
