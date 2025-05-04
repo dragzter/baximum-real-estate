@@ -13,6 +13,22 @@ export function formatCurrency(amount: number): string {
 	});
 }
 
+export function parseCurrency(value: string | number): number {
+	if (typeof value === 'number') return value;
+	const clean = value?.replace(/[^0-9.-]+/g, '') ?? '0';
+	return parseFloat(clean);
+}
+
+export function currencySortFn(
+	rowA: { getValue: (id: string) => string },
+	rowB: { getValue: (id: string) => string },
+	columnId: string
+): number {
+	const a = parseCurrency(rowA.getValue(columnId));
+	const b = parseCurrency(rowB.getValue(columnId));
+	return a - b;
+}
+
 export const DATA_KEYS = {
 	address: 'Address',
 	units: 'Units',

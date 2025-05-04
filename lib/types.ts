@@ -18,6 +18,9 @@ export type Deal = {
 	investors?: Investor[];
 };
 
+export type DealPatch = Partial<Deal>; // Used for PATCH request when we only want to update a
+// partial of the Deal type
+
 export type Investor = {
 	name: string;
 	email: string;

@@ -1,18 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AiController } from '@/lib/api/ai';
-import { properties } from '@/lib/data';
-
-const ai = new AiController();
+import { propertyManager } from '@/lib/api/property-manager';
 
 export async function POST(req: NextRequest) {
 	try {
-		const { data, isDashBoard, supporting } = await req.json();
+		const { property } = await req.json();
 
-		const aiResponse = await ai.ask2(aiPrompt);
+		const propertyResponse = await propertyManager().save(property);
 
-		return NextResponse.json({ result: aiResponse });
+		return NextResponse.json({ result: propertyResponse });
 	} catch (error) {
 		console.error('Error in POST request:', error);
+		return new Response('Internal Server Error', { status: 500 });
+	}
+}
+
+export async function GET() {
+	try {
+		const propertyResponse = await propertyManager().getAll();
+		return NextResponse.json({ result: propertyResponse });
+	} catch (error) {
+		console.error('Error in GET request:', error);
 		return new Response('Internal Server Error', { status: 500 });
 	}
 }

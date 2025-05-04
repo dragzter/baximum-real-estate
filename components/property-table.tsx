@@ -13,7 +13,7 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from '@tanstack/react-table';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, Loader2, Pencil, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -21,6 +21,7 @@ import {
 	DropdownMenuCheckboxItem,
 	DropdownMenuContent,
 } from '@/components/ui/dropdown-menu';
+import { useEffect, useMemo } from 'react';
 import {
 	Table,
 	TableBody,
@@ -29,106 +30,179 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
-import { properties } from '@/lib/data';
 import { Deal } from '@/lib/types';
+import { currencySortFn, parseCurrency } from '@/lib/utils';
+import { useDealsStore } from '@/lib/store';
 
-const data: Deal[] = properties;
-
-export const columns: ColumnDef<Deal>[] = [
-	// {
-	// 	id: 'select',
-	// 	header: ({ table }) => (
-	// 		<Checkbox
-	// 			checked={
-	// 				table.getIsAllPageRowsSelected() ||
-	// 				(table.getIsSomePageRowsSelected() && 'indeterminate')
-	// 			}
-	// 			onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-	// 			aria-label="Select all"
-	// 		/>
-	// 	),
-	// 	cell: ({ row }) => (
-	// 		<Checkbox
-	// 			checked={row.getIsSelected()}
-	// 			onCheckedChange={(value) => row.toggleSelected(!!value)}
-	// 			aria-label="Select row"
-	// 		/>
-	// 	),
-	// 	enableSorting: false,
-	// 	enableHiding: false,
-	// },
-	{
-		accessorKey: 'address',
-		header: 'Address',
-	},
-	{
-		accessorKey: 'units',
-		header: ({ column }) => {
-			return (
-				<Button
-					style={{ paddingLeft: 0 }}
-					variant="ghost"
-					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-				>
-					Units
-					<ArrowUpDown />
-				</Button>
-			);
-		},
-		cell: ({ row }) => <div className="lowercase">{row.getValue('units')}</div>,
-	},
-	{
-		accessorKey: 'purchase_price',
-		header: 'Purchase Price',
-	},
-	{
-		header: () => 'Down Payment and Reserves',
-		accessorKey: 'down_payment_reserves',
-	},
-	{
-		header: 'Purchase Date',
-		accessorKey: 'purchase_date',
-		cell: ({ row }) => new Date(row.getValue('purchase_date')).toLocaleDateString(),
-	},
-	{
-		header: 'Sale Price',
-		accessorKey: 'sale_price',
-	},
-	{
-		header: 'Gross Profit',
-		accessorKey: 'gross_profit',
-	},
-	{
-		header: 'Unstabilized Scheduled Income',
-		accessorKey: 'unstabilized_projected_income',
-	},
-	{
-		header: 'Current or Realized Income',
-		accessorKey: 'current_realized_income',
-	},
-	{
-		header: 'Capital Event Date',
-		accessorKey: 'sale_or_refinance_date',
-		cell: ({ row }) =>
-			row.getValue('sale_or_refinance_date') &&
-			new Date(row.getValue('sale_or_refinance_date')).toLocaleDateString(),
-	},
-	{
-		header: 'Major Capital Event',
-		accessorKey: 'major_capital_event',
-		cell: ({ row }) => (row.getValue('major_capital_event') ? 'Yes' : 'No'),
-	},
-	{
-		header: 'Estimated IRR',
-		accessorKey: 'estimated_irr',
-	},
-];
-
-export function PropertyTable() {
+export function PropertyTable({ properties }) {
 	const [sorting, setSorting] = React.useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
 	const [rowSelection, setRowSelection] = React.useState({});
+	const [data, setData] = React.useState<Deal[]>([]);
+	const loading = useDealsStore((s) => s.loading);
+
+	useEffect(() => {
+		if (properties?.length) {
+			setData(properties);
+		}
+	}, [properties]);
+
+	function handleUpdate(deal: Deal) {
+		console.log('Update clicked:', deal);
+		// Example: open edit modal or set selectedDeal in state
+	}
+
+	function handleDelete(id: string) {
+		console.log('Delete clicked, id:', id);
+		// Example: call API or show confirm dialog
+	}
+
+	const columns = useMemo<ColumnDef<Deal>[]>(
+		() => [
+			{
+				accessorKey: 'address',
+				header: 'Address',
+			},
+			{
+				accessorKey: 'units',
+				header: ({ column }) => {
+					return (
+						<Button
+							style={{ paddingLeft: 0 }}
+							variant="ghost"
+							onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+						>
+							Units
+							<ArrowUpDown />
+						</Button>
+					);
+				},
+				cell: ({ row }) => <div className="lowercase">{row.getValue('units')}</div>,
+			},
+			{
+				accessorKey: 'purchase_price',
+				header: ({ column }) => (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+					>
+						Purchase Price
+						<ArrowUpDown />
+					</Button>
+				),
+				enableSorting: true,
+				sortingFn: currencySortFn,
+				cell: ({ row }) => {
+					const val = parseCurrency(row.getValue('purchase_price'));
+					return `$${val.toLocaleString()}`;
+				},
+			},
+
+			{
+				accessorKey: 'down_payment_reserves',
+				header: ({ column }) => (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+					>
+						Down Payment & Reserves
+						<ArrowUpDown />
+					</Button>
+				),
+				enableSorting: true,
+				sortingFn: currencySortFn,
+				cell: ({ row }) => {
+					const val = parseCurrency(row.getValue('down_payment_reserves'));
+					return `$${val.toLocaleString()}`;
+				},
+			},
+			{
+				header: 'Purchase Date',
+				accessorKey: 'purchase_date',
+				cell: ({ row }) => new Date(row.getValue('purchase_date')).toLocaleDateString(),
+			},
+			{
+				header: 'Sale Price',
+				accessorKey: 'sale_price',
+			},
+			{
+				header: 'Gross Profit',
+				accessorKey: 'gross_profit',
+			},
+			{
+				accessorKey: 'estimated_value',
+				header: ({ column }) => (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+					>
+						Estimated Value
+						<ArrowUpDown />
+					</Button>
+				),
+				enableSorting: true,
+				sortingFn: currencySortFn,
+				cell: ({ row }) => {
+					const val = parseCurrency(row.getValue('estimated_value'));
+					return `$${val.toLocaleString()}`;
+				},
+			},
+			{
+				header: 'Unstabilized Scheduled Income',
+				accessorKey: 'unstabilized_projected_income',
+			},
+			{
+				header: 'Current or Realized Income',
+				accessorKey: 'current_realized_income',
+			},
+			{
+				header: 'Capital Event Date',
+				accessorKey: 'sale_or_refinance_date',
+				cell: ({ row }) =>
+					row.getValue('sale_or_refinance_date') &&
+					new Date(row.getValue('sale_or_refinance_date')).toLocaleDateString(),
+			},
+			{
+				header: 'Major Capital Event',
+				accessorKey: 'major_capital_event',
+				cell: ({ row }) => (row.getValue('major_capital_event') ? 'Yes' : 'No'),
+			},
+			{
+				header: 'Estimated IRR',
+				accessorKey: 'estimated_irr',
+			},
+			{
+				header: 'Actions',
+				id: 'actions',
+				cell: ({ row }) => {
+					const deal = row.original;
+
+					return (
+						<div className="flex gap-2">
+							<Button
+								variant="ghost"
+								className={'cursor-pointer'}
+								size="icon"
+								onClick={() => handleUpdate(deal)}
+							>
+								<Pencil className="h-4 w-4" />
+							</Button>
+							<Button
+								variant="ghost"
+								size="icon"
+								className={'cursor-pointer'}
+								onClick={() => handleDelete(deal.id)}
+							>
+								<Trash2 className="h-4 w-4 text-red-500" />
+							</Button>
+						</div>
+					);
+				},
+			},
+		],
+		[handleUpdate, handleDelete]
+	);
 
 	const table = useReactTable({
 		data,
@@ -149,23 +223,17 @@ export function PropertyTable() {
 		},
 	});
 
+	if (loading)
+		return (
+			<p className="p-4 flex">
+				<Loader2 className={'animate-spin me-4'} /> Loading properties...
+			</p>
+		);
+
 	return (
-		<div className="w-full">
-			<div className="flex items-center py-4">
-				{/*<Input*/}
-				{/*	placeholder="Filter emails..."*/}
-				{/*	value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}*/}
-				{/*	onChange={(event) =>*/}
-				{/*		table.getColumn('email')?.setFilterValue(event.target.value)*/}
-				{/*	}*/}
-				{/*	className="max-w-sm"*/}
-				{/*/>*/}
+		<div className="w-full  h-full flex flex-col">
+			<div className="flex  items-center py-4">
 				<DropdownMenu>
-					{/*<DropdownMenuTrigger asChild>*/}
-					{/*	<Button variant="outline" className="ml-auto">*/}
-					{/*		Columns <ChevronDown />*/}
-					{/*	</Button>*/}
-					{/*</DropdownMenuTrigger>*/}
 					<DropdownMenuContent align="end">
 						{table
 							.getAllColumns()
@@ -187,23 +255,28 @@ export function PropertyTable() {
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</div>
-			<div className="rounded-md border">
-				<Table>
+			<div className="rounded-md border h-[calc(100vh-300px)] overflow-auto">
+				<Table className="min-h-full h-full">
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
 							<TableRow key={headerGroup.id}>
-								{headerGroup.headers.map((header) => {
-									return (
-										<TableHead key={header.id}>
-											{header.isPlaceholder
-												? null
-												: flexRender(
-														header.column.columnDef.header,
-														header.getContext()
-													)}
-										</TableHead>
-									);
-								})}
+								{headerGroup.headers.map((header) => (
+									<TableHead
+										key={header.id}
+										className={
+											header.id === 'actions'
+												? 'sticky right-0 z-10 bg-stone-50 border-l border-gray-200'
+												: 'border-l border-gray-200'
+										}
+									>
+										{header.isPlaceholder
+											? null
+											: flexRender(
+													header.column.columnDef.header,
+													header.getContext()
+												)}
+									</TableHead>
+								))}
 							</TableRow>
 						))}
 					</TableHeader>
@@ -215,7 +288,14 @@ export function PropertyTable() {
 									data-state={row.getIsSelected() && 'selected'}
 								>
 									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id}>
+										<TableCell
+											key={cell.id}
+											className={
+												cell.column.id === 'actions'
+													? 'sticky right-0 z-10 bg-stone-50 border-l border-gray-200'
+													: 'border-l border-gray-200'
+											}
+										>
 											{flexRender(
 												cell.column.columnDef.cell,
 												cell.getContext()
@@ -233,30 +313,6 @@ export function PropertyTable() {
 						)}
 					</TableBody>
 				</Table>
-			</div>
-			<div className="flex items-center justify-end space-x-2 py-4">
-				{/*<div className="flex-1 text-sm text-muted-foreground">*/}
-				{/*	{table.getFilteredSelectedRowModel().rows.length} of{' '}*/}
-				{/*	{table.getFilteredRowModel().rows.length} row(s) selected.*/}
-				{/*</div>*/}
-				{/*<div className="space-x-2">*/}
-				{/*	<Button*/}
-				{/*		variant="outline"*/}
-				{/*		size="sm"*/}
-				{/*		onClick={() => table.previousPage()}*/}
-				{/*		disabled={!table.getCanPreviousPage()}*/}
-				{/*	>*/}
-				{/*		Previous*/}
-				{/*	</Button>*/}
-				{/*	<Button*/}
-				{/*		variant="outline"*/}
-				{/*		size="sm"*/}
-				{/*		onClick={() => table.nextPage()}*/}
-				{/*		disabled={!table.getCanNextPage()}*/}
-				{/*	>*/}
-				{/*		Next*/}
-				{/*	</Button>*/}
-				{/*</div>*/}
 			</div>
 		</div>
 	);

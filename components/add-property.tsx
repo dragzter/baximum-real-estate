@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { cn } from '@/lib/utils';
+import { v4 as uuidv4 } from 'uuid';
 import { Button } from '@/components/ui/button';
 import {
 	Form,
@@ -21,6 +22,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import axios from 'axios';
+import { Deal } from '@/lib/types';
 
 const formSchema = z.object({
 	address: z.string().min(1, { message: 'Address is required' }),
@@ -78,14 +81,42 @@ export default function PropertyForm() {
 		form.setValue(key, formatted);
 	}
 
-	function onSubmit(values: z.infer<typeof formSchema>) {
+	async function onSubmit(values: z.infer<typeof formSchema>) {
 		try {
-			console.log(values);
-			toast(
-				<pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-					<code className="text-white">{JSON.stringify(values, null, 2)}</code>
-				</pre>
-			);
+			const property: Deal = {
+				address: values.address,
+				current_realized_income: values.current_realized_income,
+				down_payment_reserves: values.down_payment_reserves,
+				estimated_irr: values.estimated_irr,
+				estimated_value: values.estimated_value,
+				gross_profit: values.gross_profit,
+				id: uuidv4(),
+				major_capital_event: values.major_capital_event,
+				purchase_date: values.purchase_date.toLocaleDateString('en-US', {
+					year: 'numeric',
+					month: '2-digit',
+					day: '2-digit',
+				}),
+				purchase_price: values.purchase_price,
+				refinance_valuation: values.refinance_valuation,
+				rent_increase_percent: values.rent_increase_percent,
+				sale_or_refinance_date: values.sale_or_refinance_date.toLocaleDateString('en-US', {
+					year: 'numeric',
+					month: '2-digit',
+					day: '2-digit',
+				}),
+				sale_price: values.sale_price,
+				units: values.units,
+				unstabilized_projected_income: values.unstabilized_projected_income,
+			};
+
+			const response = await axios.post('/api/property', { property });
+
+			toast.success('Property saved successfully!');
+
+			form.reset();
+
+			console.log(response);
 		} catch (error) {
 			console.error('Form submission error', error);
 			toast.error('Failed to submit the form. Please try again.');
@@ -109,7 +140,10 @@ export default function PropertyForm() {
 							<FormItem>
 								<FormLabel>Address</FormLabel>
 								<FormControl>
-									<Input placeholder="Property Address" {...field} />
+									<Input
+										placeholder="123 Fake Street, Anytown FS, 01234"
+										{...field}
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -149,6 +183,7 @@ export default function PropertyForm() {
 								<FormControl>
 									<Input
 										type="text"
+										placeholder={'$1,000'}
 										value={
 											field.value &&
 											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
@@ -182,7 +217,7 @@ export default function PropertyForm() {
 												)}
 											>
 												{field.value ? (
-													format(field.value, 'PPP')
+													format(field.value, 'MM/dd/yyyy')
 												) : (
 													<span>Pick a date</span>
 												)}
@@ -190,12 +225,23 @@ export default function PropertyForm() {
 											</Button>
 										</FormControl>
 									</PopoverTrigger>
-									<PopoverContent className="w-auto p-0" align="start">
+									<PopoverContent
+										className="w-auto property-date p-0"
+										align="start"
+									>
 										<Calendar
 											mode="single"
 											selected={field.value}
 											onSelect={field.onChange}
 											initialFocus
+											fromYear={1990} // Optional: start year
+											toYear={2025}
+											captionLayout="dropdown"
+											classNames={{
+												caption_dropdowns: 'flex gap-2 justify-center',
+												dropdown:
+													'border rounded px-2 py-1 text-sm bg-white dark:bg-zinc-900',
+											}}
 										/>
 									</PopoverContent>
 								</Popover>
@@ -213,7 +259,7 @@ export default function PropertyForm() {
 								<FormControl>
 									<Input
 										type="text"
-										placeholder="Reserves"
+										placeholder={'$1,000'}
 										value={
 											field.value &&
 											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
@@ -314,6 +360,7 @@ export default function PropertyForm() {
 								<FormControl>
 									<Input
 										type="text"
+										placeholder={'$1,000'}
 										value={
 											field.value &&
 											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
@@ -338,6 +385,7 @@ export default function PropertyForm() {
 								<FormControl>
 									<Input
 										type="text"
+										placeholder={'$1,000'}
 										value={
 											field.value &&
 											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
@@ -363,6 +411,7 @@ export default function PropertyForm() {
 								<FormControl>
 									<Input
 										type="text"
+										placeholder={'$1,000'}
 										value={
 											field.value &&
 											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
@@ -420,7 +469,7 @@ export default function PropertyForm() {
 												)}
 											>
 												{field.value ? (
-													format(field.value, 'PPP')
+													format(field.value, 'MM/dd/yyyy')
 												) : (
 													<span>Pick a date</span>
 												)}
@@ -428,12 +477,22 @@ export default function PropertyForm() {
 											</Button>
 										</FormControl>
 									</PopoverTrigger>
-									<PopoverContent className="w-auto p-0" align="start">
+									<PopoverContent
+										className="w-auto p-0 property-date"
+										align="start"
+									>
 										<Calendar
 											mode="single"
 											selected={field.value}
 											onSelect={field.onChange}
-											initialFocus
+											fromYear={1990} // Optional: start year
+											toYear={2025}
+											captionLayout="dropdown"
+											classNames={{
+												caption_dropdowns: 'flex gap-2 justify-center',
+												dropdown:
+													'border rounded px-2 py-1 text-sm bg-white dark:bg-zinc-900',
+											}}
 										/>
 									</PopoverContent>
 								</Popover>
@@ -453,7 +512,7 @@ export default function PropertyForm() {
 						<FormItem>
 							<FormLabel>Estimated IRR %</FormLabel>
 							<FormControl>
-								<Input type="text" placeholder="Estimated IRR" {...field} />
+								<Input type="text" placeholder="100%" {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>

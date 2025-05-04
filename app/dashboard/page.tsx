@@ -4,18 +4,19 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import PageNav from '@/components/page-nav';
-import { Bot, Check, Copy } from 'lucide-react';
+import { Bot, Check, Copy, List, Plus } from 'lucide-react';
 import axios from 'axios';
 import { useEffect, useMemo, useState } from 'react';
 import { SheetDrawer } from '@/components/sheet-drawer';
-import { properties } from '@/lib/data';
 import { Deal } from '@/lib/types';
 import { PropertyTable } from '@/components/property-table';
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { useGeneralAppStateStore, useUserStore } from '@/lib/store';
+import { useDealsStore, useGeneralAppStateStore, useUserStore } from '@/lib/store';
 import { Loader2 } from 'lucide-react';
 import { VIEWS } from '@/lib/utils';
 import AddProperty from '@/components/add-property';
+import { useRouter } from 'next/navigation';
+import * as React from 'react';
 
 type Chat = {
 	q: string;
@@ -28,14 +29,26 @@ export default function Dashboard() {
 	const [chats, setChats] = useState<Chat[]>([]);
 	const [copied, setCopied] = useState(false);
 	const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
-	const { user } = useUser();
+	const { user, isLoading } = useUser();
 	const getUser = useUserStore((s) => s.getUser);
+	const setView = useGeneralAppStateStore((s) => s.setView);
 	const view = useGeneralAppStateStore((s) => s.view);
 	const isDashBoard = view === VIEWS.dashboard;
+	const router = useRouter();
+	const deals = useDealsStore((s) => s.properties);
 
-	const deals: Deal[] = useMemo(() => {
-		return properties; // this is a placeholder, there will be filtering here
-	}, []);
+	const getProperties = useDealsStore((s) => s.getProperties);
+
+	React.useEffect(() => {
+		async function fetchProperties() {
+			try {
+				await getProperties(); // This updates the store
+			} catch (err) {
+				console.error('Failed to fetch properties:', err);
+			}
+		}
+		fetchProperties();
+	}, [getProperties]);
 
 	const handleKeyDown = async (event: Event, text: string) => {
 		if (
@@ -51,12 +64,16 @@ export default function Dashboard() {
 	};
 
 	useEffect(() => {
-		if (user?.sub) {
-			(async () => {
-				await getUser(encodeURIComponent(user.sub as string));
-			})();
+		if (!isLoading) {
+			if (user?.sub) {
+				(async () => {
+					await getUser(encodeURIComponent(user.sub as string));
+				})();
+			} else {
+				router.push('/');
+			}
 		}
-	}, [user, getUser]);
+	}, [user, getUser, isLoading, router]);
 
 	const selectedProperty = useMemo(() => {
 		return deals.find((deal) => deal.id === selectedPropertyId);
@@ -64,21 +81,25 @@ export default function Dashboard() {
 
 	const selectProperty = (deal: Deal) => {
 		setSelectedPropertyId(deal.id);
-		console.log('setting property');
 	};
 
 	const askAi = async (text: string) => {
 		try {
 			setLoading(true);
 
-			const payload: { data: string; supporting?: undefined | Deal; isDashBoard: boolean } = {
-				data: text,
-				supporting: undefined,
-				isDashBoard,
-			};
+			const payload: { data: string; supporting?: undefined | string; isDashBoard: boolean } =
+				{
+					data: text,
+					supporting: undefined,
+					isDashBoard,
+				};
 
-			if (selectedProperty && !isDashBoard) {
-				payload.supporting = selectedProperty;
+			if (selectedProperty && view === VIEWS.dashboard) {
+				payload.supporting = JSON.stringify(selectedProperty);
+			}
+
+			if (view !== VIEWS.dashboard) {
+				payload.supporting = JSON.stringify(deals);
 			}
 
 			const resp = await axios.post('/api/ai', payload);
@@ -94,6 +115,12 @@ export default function Dashboard() {
 			console.log(err);
 		}
 	};
+
+	// Return nothing if not logged in
+	if (isLoading || !user) {
+		return null;
+	}
+
 	return (
 		<>
 			<PageNav />
@@ -177,6 +204,50 @@ export default function Dashboard() {
 					className="w-3/4 p-6 bg-background h-[calc(100vh-84px)] overflow-y-auto min-w-[350px]"
 				>
 					<div className="mb-8 flex items-center justify-start gap-4 flex-wrap">
+						{view === VIEWS.property_list && (
+							<div>
+								<p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">
+									Property Master List
+								</p>
+								<h2 className="text-3xl font-bold text-foreground">
+									Global Deals List
+								</h2>
+								<p className={'text-xs mt-2'}>
+									Add a new deal:{' '}
+									<Button
+										size={'sm'}
+										variant={'outline'}
+										className={' cursor-pointer'}
+										onClick={() => setView(VIEWS.add_property)}
+									>
+										Add New Deal <Plus />
+									</Button>
+								</p>
+							</div>
+						)}
+
+						{view === VIEWS.add_property && (
+							<div>
+								<p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">
+									New Deal
+								</p>
+								<h2 className="text-3xl font-bold text-foreground">
+									Adding Real Estate Deal
+								</h2>
+								<p className={'text-xs mt-2'}>
+									View all deals:{' '}
+									<Button
+										size={'sm'}
+										variant={'outline'}
+										className={' cursor-pointer'}
+										onClick={() => setView(VIEWS.property_list)}
+									>
+										List <List />
+									</Button>
+								</p>
+							</div>
+						)}
+
 						{view === VIEWS.dashboard && (
 							<div>
 								<p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">
@@ -279,13 +350,11 @@ export default function Dashboard() {
 					)}
 					{view === VIEWS.property_list && (
 						<div className="grid grid-cols-4 md:grid-cols-1 gap-6 mt-8">
-							<h2 className={'font-bold text-gray-900 sm:truncate'}>Property List</h2>
-							<PropertyTable />
+							<PropertyTable properties={deals} />
 						</div>
 					)}
 					{view === VIEWS.add_property && (
-						<div className="grid grid-cols-12 md:grid-cols-1 gap-4 mt-2">
-							<h2 className={'font-bold text-gray-900 sm:truncate'}>Add Property</h2>
+						<div className="grid h-[calc(100vh-84px)] grid-cols-12 md:grid-cols-1 gap-4 mt-2">
 							<AddProperty />
 						</div>
 					)}

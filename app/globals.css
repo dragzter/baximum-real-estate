@@ -128,3 +128,13 @@
   background: #f6f6f6;
   border: 1px solid #e7e7e7;
 }
+
+.rdp-vhidden {
+  display: none !important;
+}
+
+/* Hide the duplicate "August" and "2025" text beside the dropdowns */
+.rdp-dropdown_month > div[aria-hidden="true"],
+.rdp-dropdown_year > div[aria-hidden="true"] {
+  display: none !important;
+}
