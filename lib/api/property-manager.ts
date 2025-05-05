@@ -1,10 +1,17 @@
 import connect from '@/lib/db/connect';
 import { ApiResponse, Deal, DealPatch } from '@/lib/types';
 import PropertyModel from '@/lib/db/schema/property';
+import { DeleteResult } from 'mongoose';
 
-export function propertyManager() {
+export function propertyManager(debug = false) {
 	async function c() {
 		await connect();
+	}
+
+	function _debug(err) {
+		if (debug) {
+			console.log(err);
+		}
 	}
 
 	/**
@@ -49,7 +56,7 @@ export function propertyManager() {
 				},
 			};
 		} catch (err) {
-			console.log(err);
+			_debug(err);
 			return {
 				success: false,
 				error: err,
@@ -68,26 +75,70 @@ export function propertyManager() {
 		updateData: DealPatch
 	): Promise<ApiResponse<{ updatedRecord: Deal }>> {
 		try {
+			await c(); // Connect if necessary
+
+			console.log('handler update', updateData);
+
+			const single = await PropertyModel.findOne({ id });
+
+			console.log('single', single);
+
 			const property = await PropertyModel.findOneAndUpdate(
 				{ id }, // We search on the user defined ID - defined at create time (in the form).
 				{ $set: updateData },
 				{ new: true }
 			);
 
-			return {
-				message: 'Update successful.',
-				success: true,
-				data: {
-					updatedRecord: property as Deal,
-				},
-			};
+			if (property) {
+				return {
+					message: 'Update successful.',
+					success: true,
+					data: {
+						updatedRecord: property as Deal,
+					},
+				};
+			} else {
+				return {
+					success: false,
+					message: 'Update failed.',
+				};
+			}
 		} catch (err) {
-			console.log(err);
+			_debug(err);
 			return {
 				success: false,
 				message:
 					'Update failed.  Read the error or read the server console for more information.',
 				error: err,
+			};
+		}
+	}
+
+	/**
+	 * Delete 1 record based on id.
+	 * https://mongoosejs.com/docs/5.x/docs/api/model.html#model_Model.deleteOne
+	 * @param id
+	 */
+	async function d(id: string): Promise<ApiResponse<{ query: DeleteResult }>> {
+		try {
+			await c();
+
+			const resp = await PropertyModel.deleteOne({ id });
+
+			return {
+				success: true,
+				message: 'Property deleted successfully.',
+				data: {
+					query: resp as DeleteResult,
+				},
+			};
+		} catch (err) {
+			_debug(err);
+
+			return {
+				success: false,
+				error: err,
+				message: 'Delete unsuccessful',
 			};
 		}
 	}
@@ -108,17 +159,46 @@ export function propertyManager() {
 				},
 			};
 		} catch (err) {
-			console.log(err);
+			_debug(err);
+
+			return {
+				success: false,
+				error: err,
+			};
 		}
 	}
 
-	async function g(id: string): Promise<Deal | null> {
+	async function g(id: string): Promise<ApiResponse<{ property: Deal | null }>> {
 		try {
 			await c();
 
-			return (await PropertyModel.findOne({ id }).lean().exec()) as unknown as Deal | null;
+			const property = (await PropertyModel.findOne({ id })
+				.lean()
+				.exec()) as unknown as Deal | null;
+
+			if (!property) {
+				return {
+					success: false,
+					message: 'Property not found.',
+				};
+			}
+
+			console.log(property.purchase_date);
+
+			return {
+				success: true,
+				data: {
+					property: property as Deal,
+				},
+			};
 		} catch (err) {
-			console.log(err);
+			_debug(err);
+
+			return {
+				success: false,
+				message: 'There was a problem with the GET request.',
+				error: err,
+			};
 		}
 	}
 
@@ -126,6 +206,7 @@ export function propertyManager() {
 		save: (p: Deal) => s(p),
 		get: (id: string) => g(id),
 		getAll: () => ga(),
+		delete: (id: string) => d(id),
 		update: (id: string, propertyData: DealPatch) => u(id, propertyData),
 	};
 }

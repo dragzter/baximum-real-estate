@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { BaxUser, Deal } from '@/lib/types';
+import { BaxUser, Deal, DealPatch } from '@/lib/types';
 import axios from 'axios';
 import { VIEWS } from '@/lib/utils';
 
@@ -20,9 +20,14 @@ interface GeneralState {
 interface DealsState {
 	properties: Deal[];
 	loading: boolean;
+	deleteLoading: boolean;
+	getLoading: boolean;
 	setProperties: (p: Deal[]) => void;
 	getProperties: () => void;
 	setLoading: (s: boolean) => void;
+	deleteDeal: (id: string) => void;
+	updateDeal: (id: string, data: DealPatch) => void;
+	getProperty: (id: string) => Promise<Deal>;
 }
 
 export const useUserStore = create<UserState>((set) => ({
@@ -50,15 +55,61 @@ export const useGeneralAppStateStore = create<GeneralState>((set) => ({
 	setView: (s: (typeof VIEWS)[keyof typeof VIEWS]) => set({ view: s }),
 }));
 
-export const useDealsStore = create<DealsState>((set) => ({
+export const useDealsStore = create<DealsState>((set, get) => ({
 	properties: [],
 	loading: false,
+	deleteLoading: false,
+	getLoading: false,
+	updateDeal: async (id: string, updateData: DealPatch) => {
+		try {
+			const res = await axios.patch('/api/property/update/' + id, { updateData });
+
+			if (res.data.success) {
+				get().getProperties();
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	},
+	deleteDeal: async (id: string) => {
+		try {
+			set({ deleteLoading: true });
+
+			const res = await axios.delete('/api/property/' + id);
+
+			if (res.data.success) {
+				set((state) => ({
+					properties: state.properties.filter((prop) => prop.id !== id),
+				}));
+			}
+		} catch (error) {
+			console.log(error);
+		} finally {
+			set({ deleteLoading: false });
+		}
+	},
+	getProperty: async (id: string): Promise<Deal> => {
+		try {
+			set({ deleteLoading: true });
+
+			const res = await axios.get('/api/property/' + id);
+
+			if (res.data.success) {
+				get().getProperties();
+			}
+
+			return res.data.data.property as Deal;
+		} catch (error) {
+			console.log(error);
+		} finally {
+			set({ deleteLoading: false });
+		}
+	},
 	setLoading: (val: boolean) => set({ loading: val }),
 	setProperties: (properties: Deal[]) => set({ properties }),
 	getProperties: async () => {
 		try {
 			set({ loading: true });
-			console.log('calling properties');
 			const res = await axios.get('/api/property');
 			const { properties } = res.data.result.data;
 

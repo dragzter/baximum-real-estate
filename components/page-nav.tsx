@@ -13,6 +13,8 @@ export default function PageNav() {
 				</Link>
 			</div>
 
+			<p className={'font-bold text-orange-600 ms-auto me-4'}>BETA</p>
+
 			<div className="space-x-4">
 				<NavMenuDropdown />
 			</div>

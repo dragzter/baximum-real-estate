@@ -10,7 +10,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { House, Loader2, LogOut, Plus, Radar, User } from 'lucide-react';
+import { Glasses, House, Loader2, LogOut, Plus, Radar, User } from 'lucide-react';
 import { useGeneralAppStateStore, useUserStore } from '@/lib/store';
 import Link from 'next/link';
 import { VIEWS } from '@/lib/utils';
@@ -58,6 +58,12 @@ export function NavMenuDropdown() {
 						onClick={() => setView(VIEWS.add_property)}
 					>
 						<Plus /> Add Property
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						style={{ cursor: 'pointer' }}
+						onClick={() => setView(VIEWS.detail)}
+					>
+						<Glasses /> Details
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
 

@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import PageNav from '@/components/page-nav';
-import { Bot, Check, Copy, List, Plus } from 'lucide-react';
+import { Bot, Check, Copy, ExternalLink, LayoutDashboard, List, Plus } from 'lucide-react';
 import axios from 'axios';
 import { useEffect, useMemo, useState } from 'react';
 import { SheetDrawer } from '@/components/sheet-drawer';
@@ -17,6 +17,7 @@ import { VIEWS } from '@/lib/utils';
 import AddProperty from '@/components/add-property';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
+import EditPropertyForm from '@/components/edit-property';
 
 type Chat = {
 	q: string;
@@ -30,6 +31,8 @@ export default function Dashboard() {
 	const [copied, setCopied] = useState(false);
 	const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
 	const { user, isLoading } = useUser();
+	const [editId, setEditId] = useState('');
+	const [editPropertyAddress, setEditPropertyAddress] = useState('');
 	const getUser = useUserStore((s) => s.getUser);
 	const setView = useGeneralAppStateStore((s) => s.setView);
 	const view = useGeneralAppStateStore((s) => s.view);
@@ -61,6 +64,12 @@ export default function Dashboard() {
 		} else {
 			return;
 		}
+	};
+
+	const editDeal = (deal: Deal) => {
+		setEditId(deal.id);
+		setEditPropertyAddress(deal.address);
+		setView(VIEWS.update_property);
 	};
 
 	useEffect(() => {
@@ -226,6 +235,50 @@ export default function Dashboard() {
 							</div>
 						)}
 
+						{view === VIEWS.dashboard && (
+							<div>
+								<p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">
+									Deal Statistics
+								</p>
+								<h2 className="text-3xl font-bold text-foreground">
+									Deals Dashboard
+								</h2>
+								<p className={'text-xs mt-2'}>
+									View individual properties:{' '}
+									<Button
+										size={'sm'}
+										variant={'outline'}
+										className={' cursor-pointer'}
+										onClick={() => setView(VIEWS.detail)}
+									>
+										Property Details <ExternalLink />
+									</Button>
+								</p>
+							</div>
+						)}
+
+						{view === VIEWS.update_property && (
+							<div>
+								<p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">
+									edit Deal
+								</p>
+								<h2 className="text-3xl font-bold text-foreground">
+									Editing Deal: {editPropertyAddress}
+								</h2>
+								<p className={'text-xs mt-2'}>
+									Edit Deal values and submit changes.{' '}
+									<Button
+										size={'sm'}
+										variant={'outline'}
+										className={' cursor-pointer'}
+										onClick={() => setView(VIEWS.property_list)}
+									>
+										Back To List <List />
+									</Button>
+								</p>
+							</div>
+						)}
+
 						{view === VIEWS.add_property && (
 							<div>
 								<p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">
@@ -248,7 +301,7 @@ export default function Dashboard() {
 							</div>
 						)}
 
-						{view === VIEWS.dashboard && (
+						{view === VIEWS.detail && (
 							<div>
 								<p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">
 									Selected Property
@@ -268,10 +321,21 @@ export default function Dashboard() {
 										</span>
 									</p>
 								)}
+								<p className={'text-xs mt-2'}>
+									View property dashboard:{' '}
+									<Button
+										size={'sm'}
+										variant={'outline'}
+										className={' cursor-pointer'}
+										onClick={() => setView(VIEWS.dashboard)}
+									>
+										Dashboard <LayoutDashboard />
+									</Button>
+								</p>
 							</div>
 						)}
 
-						{view === VIEWS.dashboard && (
+						{view === VIEWS.detail && (
 							<SheetDrawer buttonText={'Select Property'}>
 								{deals.map((deal) => (
 									<Card
@@ -300,7 +364,7 @@ export default function Dashboard() {
 							</SheetDrawer>
 						)}
 					</div>
-					{view === VIEWS.dashboard && selectedProperty && (
+					{view === VIEWS.detail && selectedProperty && (
 						<div className="grid grid-cols-6 md:grid-cols-6 gap-6 mt-8">
 							<div>
 								Purchase Date:
@@ -350,12 +414,17 @@ export default function Dashboard() {
 					)}
 					{view === VIEWS.property_list && (
 						<div className="grid grid-cols-4 md:grid-cols-1 gap-6 mt-8">
-							<PropertyTable properties={deals} />
+							<PropertyTable properties={deals} handleEditProperty={editDeal} />
 						</div>
 					)}
 					{view === VIEWS.add_property && (
-						<div className="grid h-[calc(100vh-84px)] grid-cols-12 md:grid-cols-1 gap-4 mt-2">
-							<AddProperty />
+						<div className="grid h-[calc(100vh-84px)] grid-cols-1 gap-4 mt-2">
+							<AddProperty handleDealAdded={getProperties} />
+						</div>
+					)}
+					{view === VIEWS.update_property && (
+						<div className="grid h-[calc(100vh-84px)] grid-cols-1 gap-4 mt-2">
+							<EditPropertyForm editId={editId} />
 						</div>
 					)}
 				</div>

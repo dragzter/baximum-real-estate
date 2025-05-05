@@ -21,14 +21,30 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
-import axios from 'axios';
 import { Deal } from '@/lib/types';
+import { useEffect, useRef, useState } from 'react';
+import { useDealsStore } from '@/lib/store';
+import { isEqual } from 'lodash-es';
 
-export default function PropertyForm({ handleDealAdded }) {
+export default function EditPropertyForm({ editId }) {
+	const getProperty = useDealsStore((s) => s.getProperty);
+	const [property, setProperty] = useState({} as Deal);
+	const [dataIsUnchanged, setDataIsUnchanged] = useState();
+	const dataIsUnchangedRef = useRef(true);
+	const updateDeal = useDealsStore((s) => s.updateDeal);
+
+	useEffect(() => {
+		if (editId) {
+			(async function () {
+				const property = await getProperty(editId as string);
+				setProperty(property);
+			})();
+		}
+	}, [editId, getProperty]);
+
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			id: '',
 			address: '',
 			units: 1,
 			purchase_price: '',
@@ -47,13 +63,51 @@ export default function PropertyForm({ handleDealAdded }) {
 		},
 	});
 
+	useEffect(() => {
+		if (property) {
+			const fProperty = {
+				...property,
+				purchase_date: property.purchase_date
+					? new Date(property.purchase_date)
+					: undefined,
+				sale_or_refinance_date: property.sale_or_refinance_date
+					? new Date(property.sale_or_refinance_date)
+					: undefined,
+			};
+
+			const sub = form.watch((value) => {
+				const unchanged = isEqual(value, fProperty);
+				dataIsUnchangedRef.current = unchanged;
+				setDataIsUnchanged(unchanged);
+			});
+
+			return () => sub.unsubscribe();
+		}
+	}, [form, property, setDataIsUnchanged, dataIsUnchanged]);
+
+	useEffect(() => {
+		if (property) {
+			form.reset({
+				...property,
+				purchase_date: property.purchase_date
+					? new Date(property.purchase_date)
+					: undefined,
+				sale_or_refinance_date: property.sale_or_refinance_date
+					? new Date(property.sale_or_refinance_date)
+					: undefined,
+			});
+		}
+	}, [property]);
+
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		try {
-			const property: Deal = buildPostDataForAddProperty(values, true);
-			await axios.post('/api/property', { property });
-			toast.success('Property saved successfully!');
-			form.reset();
-			await handleDealAdded();
+			const property: Deal = buildPostDataForAddProperty(values, false);
+			//await axios.post('/api/property', { property });
+			await updateDeal(property.id, property);
+
+			console.log(property);
+			toast.success('Property updated successfully!');
+			//form.reset();
 		} catch (error) {
 			console.error('Form submission error', error);
 			toast.error('Failed to submit the form. Please try again.');
@@ -177,6 +231,7 @@ export default function PropertyForm({ handleDealAdded }) {
 											initialFocus
 											fromYear={1990} // Optional: start year
 											toYear={2025}
+											month={field.value ?? undefined}
 											captionLayout="dropdown"
 											classNames={{
 												caption_dropdowns: 'flex gap-2 justify-center',
@@ -447,6 +502,7 @@ export default function PropertyForm({ handleDealAdded }) {
 											fromYear={1990} // Optional: start year
 											toYear={2025}
 											captionLayout="dropdown"
+											month={field.value ?? undefined}
 											classNames={{
 												caption_dropdowns: 'flex gap-2 justify-center',
 												dropdown:
@@ -478,7 +534,14 @@ export default function PropertyForm({ handleDealAdded }) {
 					)}
 				/>
 
-				<Button type="submit">Add Property</Button>
+				<Button disabled={dataIsUnchanged} type="submit" className={'cursor-pointer'}>
+					Edit Property
+				</Button>
+				{dataIsUnchanged && (
+					<p className={'text-sm mt-2 text-rose-500  ms-4 inline-block'}>
+						Modify at least one value.
+					</p>
+				)}
 			</form>
 		</Form>
 	);

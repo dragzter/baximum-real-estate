@@ -34,13 +34,14 @@ import { Deal } from '@/lib/types';
 import { currencySortFn, parseCurrency } from '@/lib/utils';
 import { useDealsStore } from '@/lib/store';
 
-export function PropertyTable({ properties }) {
+export function PropertyTable({ properties, handleEditProperty }) {
 	const [sorting, setSorting] = React.useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
 	const [rowSelection, setRowSelection] = React.useState({});
 	const [data, setData] = React.useState<Deal[]>([]);
 	const loading = useDealsStore((s) => s.loading);
+	const deleteDeal = useDealsStore((s) => s.deleteDeal);
 
 	useEffect(() => {
 		if (properties?.length) {
@@ -49,14 +50,15 @@ export function PropertyTable({ properties }) {
 	}, [properties]);
 
 	function handleUpdate(deal: Deal) {
-		console.log('Update clicked:', deal);
-		// Example: open edit modal or set selectedDeal in state
+		handleEditProperty(deal);
 	}
 
-	function handleDelete(id: string) {
-		console.log('Delete clicked, id:', id);
-		// Example: call API or show confirm dialog
-	}
+	const handleDelete = React.useCallback(
+		async (id: string) => {
+			deleteDeal(id);
+		},
+		[deleteDeal]
+	);
 
 	const columns = useMemo<ColumnDef<Deal>[]>(
 		() => [
@@ -129,6 +131,10 @@ export function PropertyTable({ properties }) {
 			{
 				header: 'Gross Profit',
 				accessorKey: 'gross_profit',
+			},
+			{
+				header: 'Percent Rent Increase',
+				accessorKey: 'rent_increase_percent',
 			},
 			{
 				accessorKey: 'estimated_value',
