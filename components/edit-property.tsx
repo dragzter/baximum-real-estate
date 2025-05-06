@@ -7,6 +7,7 @@ import * as z from 'zod';
 import {
 	buildPostDataForAddProperty,
 	cn,
+	DATA_KEYS,
 	formatCurrencyOnChange,
 	formSchema,
 	VIEWS,
@@ -532,19 +533,51 @@ export default function EditPropertyForm({ editId }) {
 					/>
 				</div>
 
-				<FormField
-					control={form.control}
-					name="estimated_irr"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Estimated IRR %</FormLabel>
-							<FormControl>
-								<Input type="text" placeholder="100%" {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+					<FormField
+						control={form.control}
+						name="estimated_irr"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Estimated IRR %</FormLabel>
+								<FormControl>
+									<Input type="text" placeholder="100%" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						control={form.control}
+						name="refinance_valuation"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>{DATA_KEYS.refinance_valuation}</FormLabel>
+								<FormControl>
+									<Input
+										type="text"
+										placeholder={'$1,000'}
+										value={
+											field.value &&
+											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
+												? `$${Number(field.value.replace(/[^0-9.]/g, '')).toLocaleString()}`
+												: ''
+										}
+										onChange={(e) =>
+											formatCurrencyOnChange(
+												'refinance_valuation',
+												e.target.value,
+												form
+											)
+										}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+				</div>
 
 				<Button disabled={dataIsUnchanged} type="submit" className={'cursor-pointer'}>
 					Edit Property
