@@ -18,6 +18,11 @@ import AddProperty from "@/components/add-property";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import EditPropertyForm from "@/components/edit-property";
+import { IRRBarChart } from "@/components/bar-chart2";
+import { UnitsVsIncomeChart } from "@/components/bar-chart3";
+import { RentIncreaseChart } from "@/components/bar-chart4";
+import PurchaseVsSaleChart from "@/components/bar-chart5";
+import { TimelineChart } from "@/components/time-chart";
 
 type Chat = {
 	q: string;
@@ -97,11 +102,11 @@ export default function Dashboard() {
 				isDashBoard,
 			};
 
-			if (selectedProperty && view === VIEWS.dashboard) {
+			if (selectedProperty && view === VIEWS.detail) {
 				payload.supporting = JSON.stringify(selectedProperty);
 			}
 
-			if (view !== VIEWS.dashboard) {
+			if (view !== VIEWS.detail) {
 				payload.supporting = JSON.stringify(deals);
 			}
 
@@ -170,7 +175,7 @@ export default function Dashboard() {
 							</p>
 						)}
 
-						{!isDashBoard && (
+						{view !== VIEWS.detail && (
 							<p className="bg-purple-50 text-teal-700 px-4 py-2 rounded-md border">Querying All Properties</p>
 						)}
 						<Textarea
@@ -213,25 +218,13 @@ export default function Dashboard() {
 									>
 										Add New Deal <Plus />
 									</Button>
-								</p>
-							</div>
-						)}
-
-						{view === VIEWS.dashboard && (
-							<div>
-								<p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">
-									Deal Statistics
-								</p>
-								<h2 className="text-3xl font-bold text-foreground">Deals Dashboard</h2>
-								<p className={"text-xs mt-2"}>
-									View individual properties:{" "}
 									<Button
 										size={"sm"}
 										variant={"outline"}
-										className={" cursor-pointer"}
-										onClick={() => setView(VIEWS.detail)}
+										className={"ms-3 cursor-pointer"}
+										onClick={() => setView(VIEWS.dashboard)}
 									>
-										Property Details <ExternalLink />
+										View Dashboard <LayoutDashboard />
 									</Button>
 								</p>
 							</div>
@@ -390,6 +383,43 @@ export default function Dashboard() {
 						<div className="grid h-[calc(100vh-84px)] grid-cols-1 gap-4 mt-2">
 							<EditPropertyForm editId={editId} />
 						</div>
+					)}
+
+					{view === VIEWS.dashboard && (
+						<>
+							<div>
+								<p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">
+									Deal Statistics
+								</p>
+								<h2 className="text-3xl font-bold text-foreground">Deal Data Dashboard</h2>
+								<p className={"text-xs mt-2"}>
+									View individual properties:{" "}
+									<Button
+										size={"sm"}
+										variant={"outline"}
+										className={" cursor-pointer"}
+										onClick={() => setView(VIEWS.detail)}
+									>
+										Property Details <ExternalLink />
+									</Button>
+									<Button
+										size={"sm"}
+										variant={"outline"}
+										className={" cursor-pointer ms-3"}
+										onClick={() => setView(VIEWS.property_list)}
+									>
+										Property List <List />
+									</Button>
+								</p>
+							</div>
+							<div className="grid grid-cols-1 xl:grid-cols-3 gap-4 mt-6">
+								<IRRBarChart properties={deals} />
+								<UnitsVsIncomeChart data={deals} />
+								<RentIncreaseChart data={deals} />
+								<PurchaseVsSaleChart properties={deals} />
+								<TimelineChart properties={deals} />
+							</div>
+						</>
 					)}
 				</div>
 			</div>
