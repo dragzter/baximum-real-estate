@@ -213,7 +213,7 @@ export default function EditPropertyForm({ editId }) {
 						name="purchase_date"
 						render={({ field }) => (
 							<FormItem className="flex flex-col">
-								<FormLabel>Purchase Date</FormLabel>
+								<FormLabel>{DATA_KEYS.purchase_date}</FormLabel>
 								<Popover>
 									<PopoverTrigger asChild>
 										<FormControl>
