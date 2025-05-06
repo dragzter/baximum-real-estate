@@ -299,6 +299,10 @@ export function PropertyTable({ properties, handleEditProperty }) {
 		},
 	});
 
+	useEffect(() => {
+		table.setPageSize(700);
+	}, [table]);
+
 	if (loading)
 		return (
 			<p className="p-4 flex">
