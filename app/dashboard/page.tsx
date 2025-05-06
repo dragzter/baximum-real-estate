@@ -44,6 +44,7 @@ export default function Dashboard() {
 	const isDashBoard = view === VIEWS.dashboard;
 	const router = useRouter();
 	const deals = useDealsStore((s) => s.properties);
+	const isAdmin = useUserStore((s) => s.isAdmin);
 
 	const getProperties = useDealsStore((s) => s.getProperties);
 
@@ -210,14 +211,16 @@ export default function Dashboard() {
 								<h2 className="text-3xl font-bold text-foreground">Global Deals List</h2>
 								<p className={"text-xs mt-2"}>
 									Add a new deal:{" "}
-									<Button
-										size={"sm"}
-										variant={"outline"}
-										className={" cursor-pointer"}
-										onClick={() => setView(VIEWS.add_property)}
-									>
-										Add New Deal <Plus />
-									</Button>
+									{isAdmin && (
+										<Button
+											size={"sm"}
+											variant={"outline"}
+											className={" cursor-pointer"}
+											onClick={() => setView(VIEWS.add_property)}
+										>
+											Add New Deal <Plus />
+										</Button>
+									)}
 									<Button
 										size={"sm"}
 										variant={"outline"}
@@ -226,6 +229,11 @@ export default function Dashboard() {
 									>
 										View Dashboard <LayoutDashboard />
 									</Button>
+								</p>
+								<p className={"text-xs mt-2 text-red-800"}>
+									<strong>Disclaimer:</strong> Please note that these numbers are not calculated by an independent
+									financial firm. Closing costs and distributions are not factored in which can impact the IRR
+									positively or negatively. Estimated value is derived from Timothy Baxter&#39;s opinion solely.
 								</p>
 							</div>
 						)}
@@ -411,8 +419,13 @@ export default function Dashboard() {
 										Property List <List />
 									</Button>
 								</p>
+								<p className={"text-xs mt-2 text-red-800"}>
+									<strong>Disclaimer:</strong> Please note that these numbers are not calculated by an independent
+									financial firm. Closing costs and distributions are not factored in which can impact the IRR
+									positively or negatively. Estimated value is derived from Timothy Baxter&#39;s opinion solely.
+								</p>
 							</div>
-							<div className="grid grid-cols-1 xl:grid-cols-3 gap-4 mt-6">
+							<div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-6">
 								<IRRBarChart properties={deals} />
 								<UnitsVsIncomeChart data={deals} />
 								<RentIncreaseChart data={deals} />

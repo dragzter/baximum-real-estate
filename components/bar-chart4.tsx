@@ -17,11 +17,11 @@ export function RentIncreaseChart({ data }: Props) {
 	const maxIncrease = Math.max(...chartData.map((d) => d.increase));
 
 	return (
-		<Card className="w-full h-[500px]">
+		<Card className="w-full">
 			<CardHeader>
 				<CardTitle>Rent Increase Percent by Property</CardTitle>
 			</CardHeader>
-			<CardContent className="h-[400px]">
+			<CardContent className="h-[500px]">
 				<ResponsiveContainer width="100%" height="100%">
 					<BarChart data={chartData} layout="vertical" margin={{ top: 20, right: 50, left: 0, bottom: 20 }}>
 						<XAxis type="number" domain={[0, Math.ceil(maxIncrease + 10)]} tickFormatter={(val) => `${val}%`} />

@@ -329,7 +329,7 @@ export function PropertyTable({ properties, handleEditProperty }) {
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</div>
-			<div className="rounded-md border h-[calc(100vh-300px)] overflow-auto">
+			<div className="rounded-md border h-[calc(100vh-340px)] overflow-auto">
 				<Table className="min-h-full h-full">
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
