@@ -31,7 +31,7 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import { Deal } from '@/lib/types';
-import { currencySortFn, DATA_KEYS, numberSortingFn, parseCurrency } from '@/lib/utils';
+import { currencySortFn, DATA_KEYS, parseCurrency } from '@/lib/utils';
 import { useDealsStore, useUserStore } from '@/lib/store';
 
 export function PropertyTable({ properties, handleEditProperty }) {

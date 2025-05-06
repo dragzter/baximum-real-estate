@@ -40,15 +40,15 @@ export function currencySortFn(
 	return a - b;
 }
 
-export function numberSortingFn(
-	rowA: { getValue: (id: string) => string },
-	rowB: { getValue: (id: string) => string },
-	columnId: string
-) {
-	const a = parseInt(rowA.getValue(columnId));
-	const b = parseInt(rowB.getValue(columnId));
-	return a - b;
-}
+// export function numberSortingFn(
+// 	rowA: { getValue: (id: string) => string },
+// 	rowB: { getValue: (id: string) => string },
+// 	columnId: string
+// ) {
+// 	const a = parseInt(rowA.getValue(columnId));
+// 	const b = parseInt(rowB.getValue(columnId));
+// 	return a - b;
+// }
 
 export const DATA_KEYS = {
 	address: 'Address',

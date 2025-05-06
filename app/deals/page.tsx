@@ -1,7 +1,6 @@
 'use client';
 
 import PageNav from '@/components/page-nav';
-import { PropertyTable } from '@/components/property-table';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -35,9 +34,7 @@ export default function Deals() {
 				id="properties-list"
 				className="p-6 flex flex-col h-[calc(100vh-84px)] min-w-[400px]"
 			>
-				<div className="flex flex-col h-full w-full">
-					<PropertyTable />
-				</div>
+				<div className="flex flex-col h-full w-full">Deals table here</div>
 			</div>
 		</>
 	);
