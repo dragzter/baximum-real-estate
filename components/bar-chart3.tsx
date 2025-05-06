@@ -1,6 +1,7 @@
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from "recharts";
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Deal } from "@/lib/types";
+import { formatCurrency } from "@/lib/utils";
 
 type Props = {
 	data: Deal[];
@@ -25,7 +26,7 @@ export function UnitsVsIncomeChart({ data }: Props) {
 
 	console.log(data.map((d) => parseFloat(d.current_realized_income.toLocaleString())));
 	const maxUnits = Math.max(...scatterData.map((d) => d.x)) + 4;
-	const maxIncome = highestIncome + highestIncome / 8;
+	const maxIncome = (highestIncome + highestIncome / 8).toFixed(2);
 
 	return (
 		<Card>
@@ -34,7 +35,7 @@ export function UnitsVsIncomeChart({ data }: Props) {
 			</CardHeader>
 			<CardContent className="h-[400px]">
 				<ResponsiveContainer width="100%" height="100%">
-					<ScatterChart margin={{ right: 30, bottom: 20, left: 20 }}>
+					<ScatterChart margin={{ right: 30, bottom: 20, left: 40 }}>
 						<CartesianGrid strokeDasharray="3 3" />
 						<XAxis
 							dataKey="x"
@@ -48,11 +49,28 @@ export function UnitsVsIncomeChart({ data }: Props) {
 							type="number"
 							name="Income"
 							domain={[0, maxIncome]}
-							label={{ value: "Income ($)", angle: -90, position: "insideLeft", offset: -13 }}
+							label={{
+								value: "Income ($)",
+								angle: -90,
+								position: "insideLeft",
+								offset: -12,
+							}}
+							tick={({ x, y, payload }) => (
+								<text
+									x={x - 10}
+									y={y}
+									transform={`rotate(-45, ${x - 10}, ${y})`}
+									textAnchor="end"
+									fill="#4B5563"
+									fontSize={12}
+								>
+									{formatCurrency(payload.value)}
+								</text>
+							)}
 						/>
 						<Tooltip cursor={{ strokeDasharray: "3 3" }} />
 						<Scatter name="Properties" data={scatterData} fill="#8884d8">
-							<LabelList dataKey="name" position="bottom" />
+							{/*<LabelList dataKey="name" position="bottom" fontSize={8} />*/}
 						</Scatter>
 					</ScatterChart>
 				</ResponsiveContainer>

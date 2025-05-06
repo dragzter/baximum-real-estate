@@ -42,7 +42,7 @@ export function TimelineChart({ properties }: Props) {
 			</CardHeader>
 			<CardContent className="h-[500px]">
 				<ResponsiveContainer width="100%" height="100%">
-					<BarChart layout="vertical" data={chartData} margin={{ top: 20, right: 60, left: 0, bottom: 20 }}>
+					<BarChart layout="vertical" data={chartData} margin={{ top: 20, right: 60, left: 20, bottom: 40 }}>
 						<XAxis
 							type="number"
 							domain={["dataMin", "dataMax"]}
@@ -51,11 +51,11 @@ export function TimelineChart({ properties }: Props) {
 						<YAxis
 							dataKey="address"
 							type="category"
-							width={70}
+							width={170}
 							tick={({ x, y, payload }) => {
 								return (
 									<g transform={`translate(${x},${y})`}>
-										<text x={0} y={0} dy={4} textAnchor="end" transform="rotate(-70)" fontSize={12} fill="#4B5563">
+										<text x={0} y={0} dy={4} textAnchor="end" transform="rotate(-25)" fontSize={12} fill="#4B5563">
 											{payload.value}
 										</text>
 									</g>

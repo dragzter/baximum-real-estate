@@ -27,7 +27,7 @@ export function IRRBarChart({ properties }: IRRChartProps) {
 				<ResponsiveContainer width="100%" height="100%">
 					<BarChart data={data}>
 						<CartesianGrid strokeDasharray="3 3" />
-						<XAxis dataKey="name" interval={0} angle={-20} textAnchor="end" height={60} />
+						<XAxis dataKey="name" interval={0} angle={-20} textAnchor="end" fontSize={12} height={60} />
 						<YAxis />
 						<Tooltip formatter={(value) => `${value}%`} />
 						<Bar dataKey="irr" fill="currentColor" className="text-primary" />

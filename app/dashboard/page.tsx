@@ -425,7 +425,7 @@ export default function Dashboard() {
 									positively or negatively. Estimated value is derived from Timothy Baxter&#39;s opinion solely.
 								</p>
 							</div>
-							<div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-6">
+							<div className="grid grid-cols-1 gap-4 mt-6">
 								<IRRBarChart properties={deals} />
 								<UnitsVsIncomeChart data={deals} />
 								<RentIncreaseChart data={deals} />

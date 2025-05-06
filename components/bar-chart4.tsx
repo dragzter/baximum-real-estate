@@ -23,12 +23,12 @@ export function RentIncreaseChart({ data }: Props) {
 			</CardHeader>
 			<CardContent className="h-[500px]">
 				<ResponsiveContainer width="100%" height="100%">
-					<BarChart data={chartData} layout="vertical" margin={{ top: 20, right: 50, left: 0, bottom: 20 }}>
+					<BarChart data={chartData} layout="vertical" margin={{ top: 20, right: 50, left: 20, bottom: 60 }}>
 						<XAxis type="number" domain={[0, Math.ceil(maxIncrease + 10)]} tickFormatter={(val) => `${val}%`} />
 						<YAxis
 							dataKey="address"
 							type="category"
-							width={80}
+							width={120}
 							tick={({ x, y, payload }) => {
 								const words = payload.value.split(" ");
 								const lines = [];
@@ -47,8 +47,8 @@ export function RentIncreaseChart({ data }: Props) {
 								return (
 									<text
 										x={x}
-										y={y - 18}
-										transform={`rotate(-70, ${x}, ${y})`}
+										y={y - 20}
+										transform={`rotate(-20, ${x}, ${y})`}
 										fontSize={13}
 										textAnchor="end"
 										fill="#4B5563"
