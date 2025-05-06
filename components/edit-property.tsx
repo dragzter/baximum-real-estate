@@ -4,7 +4,13 @@ import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { buildPostDataForAddProperty, cn, formatCurrencyOnChange, formSchema } from '@/lib/utils';
+import {
+	buildPostDataForAddProperty,
+	cn,
+	formatCurrencyOnChange,
+	formSchema,
+	VIEWS,
+} from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
 	Form,
@@ -23,7 +29,7 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Deal } from '@/lib/types';
 import { useEffect, useRef, useState } from 'react';
-import { useDealsStore } from '@/lib/store';
+import { useDealsStore, useGeneralAppStateStore } from '@/lib/store';
 import { isEqual } from 'lodash-es';
 
 export default function EditPropertyForm({ editId }) {
@@ -31,6 +37,7 @@ export default function EditPropertyForm({ editId }) {
 	const [property, setProperty] = useState({} as Deal);
 	const [dataIsUnchanged, setDataIsUnchanged] = useState();
 	const dataIsUnchangedRef = useRef(true);
+	const setView = useGeneralAppStateStore((s) => s.setView);
 	const updateDeal = useDealsStore((s) => s.updateDeal);
 
 	useEffect(() => {
@@ -107,6 +114,11 @@ export default function EditPropertyForm({ editId }) {
 
 			console.log(property);
 			toast.success('Property updated successfully!');
+
+			setTimeout(() => {
+				setView(VIEWS.property_list);
+			}, 400);
+
 			//form.reset();
 		} catch (error) {
 			console.error('Form submission error', error);

@@ -31,8 +31,8 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import { Deal } from '@/lib/types';
-import { currencySortFn, parseCurrency } from '@/lib/utils';
-import { useDealsStore } from '@/lib/store';
+import { currencySortFn, DATA_KEYS, numberSortingFn, parseCurrency } from '@/lib/utils';
+import { useDealsStore, useUserStore } from '@/lib/store';
 
 export function PropertyTable({ properties, handleEditProperty }) {
 	const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -42,6 +42,7 @@ export function PropertyTable({ properties, handleEditProperty }) {
 	const [data, setData] = React.useState<Deal[]>([]);
 	const loading = useDealsStore((s) => s.loading);
 	const deleteDeal = useDealsStore((s) => s.deleteDeal);
+	const isAdmin = useUserStore((s) => s.isAdmin);
 
 	useEffect(() => {
 		if (properties?.length) {
@@ -55,16 +56,19 @@ export function PropertyTable({ properties, handleEditProperty }) {
 
 	const handleDelete = React.useCallback(
 		async (id: string) => {
-			deleteDeal(id);
+			const _delete = confirm('Are you sure?  This will permanently remove this deal.');
+			if (_delete) {
+				deleteDeal(id);
+			}
 		},
 		[deleteDeal]
 	);
 
-	const columns = useMemo<ColumnDef<Deal>[]>(
-		() => [
+	const columns = useMemo<ColumnDef<Deal>[]>(() => {
+		let cols: ColumnDef<Deal>[] = [
 			{
 				accessorKey: 'address',
-				header: 'Address',
+				header: DATA_KEYS.address,
 			},
 			{
 				accessorKey: 'units',
@@ -75,12 +79,12 @@ export function PropertyTable({ properties, handleEditProperty }) {
 							variant="ghost"
 							onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 						>
-							Units
+							{DATA_KEYS.units}
 							<ArrowUpDown />
 						</Button>
 					);
 				},
-				cell: ({ row }) => <div className="lowercase">{row.getValue('units')}</div>,
+				cell: ({ row }) => row.getValue('units'),
 			},
 			{
 				accessorKey: 'purchase_price',
@@ -89,7 +93,7 @@ export function PropertyTable({ properties, handleEditProperty }) {
 						variant="ghost"
 						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 					>
-						Purchase Price
+						{DATA_KEYS.purchase_price}
 						<ArrowUpDown />
 					</Button>
 				),
@@ -100,7 +104,27 @@ export function PropertyTable({ properties, handleEditProperty }) {
 					return `$${val.toLocaleString()}`;
 				},
 			},
-
+			{
+				header: ({ column }) => (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+					>
+						{DATA_KEYS.purchase_date}
+						<ArrowUpDown />
+					</Button>
+				),
+				accessorKey: 'purchase_date',
+				cell: ({ row }) => {
+					const raw = row.getValue('purchase_date');
+					return raw ? new Date(raw as string).toLocaleDateString() : '';
+				},
+				sortingFn: (rowA, rowB, columnId) => {
+					const dateA = new Date(rowA.getValue(columnId)).getTime();
+					const dateB = new Date(rowB.getValue(columnId)).getTime();
+					return dateA - dateB;
+				},
+			},
 			{
 				accessorKey: 'down_payment_reserves',
 				header: ({ column }) => (
@@ -108,7 +132,7 @@ export function PropertyTable({ properties, handleEditProperty }) {
 						variant="ghost"
 						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 					>
-						Down Payment & Reserves
+						{DATA_KEYS.down_payment_reserves}
 						<ArrowUpDown />
 					</Button>
 				),
@@ -120,30 +144,13 @@ export function PropertyTable({ properties, handleEditProperty }) {
 				},
 			},
 			{
-				header: 'Purchase Date',
-				accessorKey: 'purchase_date',
-				cell: ({ row }) => new Date(row.getValue('purchase_date')).toLocaleDateString(),
-			},
-			{
-				header: 'Sale Price',
-				accessorKey: 'sale_price',
-			},
-			{
-				header: 'Gross Profit',
-				accessorKey: 'gross_profit',
-			},
-			{
-				header: 'Percent Rent Increase',
-				accessorKey: 'rent_increase_percent',
-			},
-			{
 				accessorKey: 'estimated_value',
 				header: ({ column }) => (
 					<Button
 						variant="ghost"
 						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 					>
-						Estimated Value
+						{DATA_KEYS.estimated_value}
 						<ArrowUpDown />
 					</Button>
 				),
@@ -155,60 +162,177 @@ export function PropertyTable({ properties, handleEditProperty }) {
 				},
 			},
 			{
-				header: 'Unstabilized Scheduled Income',
+				accessorKey: 'rent_increase_percent',
+				header: ({ column }) => (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+					>
+						{DATA_KEYS.rent_increase_percent}
+						<ArrowUpDown />
+					</Button>
+				),
+				enableSorting: true,
+				cell: ({ row }) => row.getValue('rent_increase_percent'),
+			},
+			{
 				accessorKey: 'unstabilized_projected_income',
+				header: ({ column }) => (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+					>
+						{DATA_KEYS.unstabilized_projected_income}
+						<ArrowUpDown />
+					</Button>
+				),
+				enableSorting: true,
+				sortingFn: currencySortFn,
+				cell: ({ row }) => {
+					const val = parseCurrency(row.getValue('unstabilized_projected_income'));
+					return `$${val.toLocaleString()}`;
+				},
 			},
 			{
-				header: 'Current or Realized Income',
 				accessorKey: 'current_realized_income',
+				header: ({ column }) => (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+					>
+						{DATA_KEYS.current_realized_income}
+						<ArrowUpDown />
+					</Button>
+				),
+				enableSorting: true,
+				sortingFn: currencySortFn,
+				cell: ({ row }) => {
+					const val = parseCurrency(row.getValue('current_realized_income'));
+					return `$${val.toLocaleString()}`;
+				},
 			},
 			{
-				header: 'Capital Event Date',
+				header: DATA_KEYS.major_capital_event,
+				accessorKey: 'major_capital_event',
+				cell: ({ row }) => (row.getValue('major_capital_event') ? 'Yes' : 'No'),
+			},
+			{
+				header: DATA_KEYS.sale_or_refinance_date,
 				accessorKey: 'sale_or_refinance_date',
 				cell: ({ row }) =>
 					row.getValue('sale_or_refinance_date') &&
 					new Date(row.getValue('sale_or_refinance_date')).toLocaleDateString(),
 			},
 			{
-				header: 'Major Capital Event',
-				accessorKey: 'major_capital_event',
-				cell: ({ row }) => (row.getValue('major_capital_event') ? 'Yes' : 'No'),
-			},
-			{
-				header: 'Estimated IRR',
-				accessorKey: 'estimated_irr',
-			},
-			{
-				header: 'Actions',
-				id: 'actions',
+				accessorKey: 'refinance_valuation',
+				header: ({ column }) => (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+					>
+						{DATA_KEYS.refinance_valuation}
+						<ArrowUpDown />
+					</Button>
+				),
+				enableSorting: true,
+				sortingFn: currencySortFn,
 				cell: ({ row }) => {
-					const deal = row.original;
-
-					return (
-						<div className="flex gap-2">
-							<Button
-								variant="ghost"
-								className={'cursor-pointer'}
-								size="icon"
-								onClick={() => handleUpdate(deal)}
-							>
-								<Pencil className="h-4 w-4" />
-							</Button>
-							<Button
-								variant="ghost"
-								size="icon"
-								className={'cursor-pointer'}
-								onClick={() => handleDelete(deal.id)}
-							>
-								<Trash2 className="h-4 w-4 text-red-500" />
-							</Button>
-						</div>
-					);
+					const val = parseCurrency(row.getValue('refinance_valuation'));
+					return row.getValue('refinance_valuation') ? `$${val.toLocaleString()}` : '';
 				},
 			},
-		],
-		[handleUpdate, handleDelete]
-	);
+			{
+				accessorKey: 'sale_price',
+				header: ({ column }) => (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+					>
+						{DATA_KEYS.sale_price}
+						<ArrowUpDown />
+					</Button>
+				),
+				enableSorting: true,
+				sortingFn: currencySortFn,
+				cell: ({ row }) => {
+					const val = parseCurrency(row.getValue('sale_price'));
+					return row.getValue('sale_price') ? `$${val.toLocaleString()}` : '';
+				},
+			},
+			{
+				accessorKey: 'gross_profit',
+				header: ({ column }) => (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+					>
+						{DATA_KEYS.gross_profit}
+						<ArrowUpDown />
+					</Button>
+				),
+				enableSorting: true,
+				sortingFn: currencySortFn,
+				cell: ({ row }) => {
+					const val = parseCurrency(row.getValue('gross_profit'));
+					return row.getValue('gross_profit') ? `$${val.toLocaleString()}` : '';
+				},
+			},
+			{
+				accessorKey: 'estimated_irr',
+				header: ({ column }) => (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+					>
+						{DATA_KEYS.estimated_irr}
+						<ArrowUpDown />
+					</Button>
+				),
+				enableSorting: true,
+				cell: ({ row }) => row.getValue('estimated_irr'),
+			},
+		];
+
+		if (isAdmin) {
+			cols = [
+				...cols,
+				{
+					header: 'Actions',
+					id: 'actions',
+					cell: ({ row }) => {
+						const deal = row.original;
+						return (
+							<div className="flex gap-2">
+								<Button
+									variant="ghost"
+									className={'cursor-pointer'}
+									size="icon"
+									onClick={() => handleUpdate(deal)}
+								>
+									<Pencil className="h-4 w-4" />
+								</Button>
+								<Button
+									variant="ghost"
+									size="icon"
+									className={'cursor-pointer'}
+									onClick={() => handleDelete(deal.id)}
+								>
+									<Trash2 className="h-4 w-4 text-red-500" />
+								</Button>
+							</div>
+						);
+					},
+				} as ColumnDef<Deal>,
+			];
+		}
+
+		return cols;
+	}, [handleUpdate, handleDelete, isAdmin]);
+
+	useEffect(() => {
+		if (isAdmin) {
+		}
+	});
 
 	const table = useReactTable({
 		data,

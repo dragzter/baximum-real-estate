@@ -8,6 +8,7 @@ interface UserState {
 	setUser: (u: BaxUser) => void;
 	getUser: (id: string) => Promise<void>;
 	loading: boolean;
+	isAdmin: boolean;
 }
 
 interface GeneralState {
@@ -33,13 +34,14 @@ interface DealsState {
 export const useUserStore = create<UserState>((set) => ({
 	user: {} as BaxUser,
 	loading: false,
+	isAdmin: false,
 	setUser: (user: BaxUser) => set({ user }),
 	getUser: async (id: string) => {
 		try {
 			set({ loading: true });
 			const resp = await axios.get(`/api/login/${id}`);
 
-			set({ user: resp?.data, loading: false });
+			set({ user: resp?.data, loading: false, isAdmin: resp.data.isAdmin });
 		} catch (err) {
 			console.log(err);
 		} finally {

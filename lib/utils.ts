@@ -40,12 +40,22 @@ export function currencySortFn(
 	return a - b;
 }
 
+export function numberSortingFn(
+	rowA: { getValue: (id: string) => string },
+	rowB: { getValue: (id: string) => string },
+	columnId: string
+) {
+	const a = parseInt(rowA.getValue(columnId));
+	const b = parseInt(rowB.getValue(columnId));
+	return a - b;
+}
+
 export const DATA_KEYS = {
 	address: 'Address',
 	units: 'Units',
 	purchase_date: 'Purchase Date',
 	purchase_price: 'Purchase Price',
-	down_payment_reserves: 'Downpayment, Closing & Reserves',
+	down_payment_reserves: 'Down Payment Closing & Reserves',
 	unstabilized_projected_income: 'Unstabilized Scheduled Income',
 	current_realized_income: 'Current or Realized Income',
 	rent_increase_percent: '% Increased in Rent',
