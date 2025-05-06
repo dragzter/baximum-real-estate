@@ -1,68 +1,54 @@
-'use client';
+"use client";
 
-import { toast } from 'sonner';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import {
-	buildPostDataForAddProperty,
-	cn,
-	DATA_KEYS,
-	formatCurrencyOnChange,
-	formSchema,
-} from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { format } from 'date-fns';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { Calendar as CalendarIcon } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
-import axios from 'axios';
-import { Deal } from '@/lib/types';
+import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { buildPostDataForAddProperty, cn, DATA_KEYS, formatCurrencyOnChange, formSchema } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { format } from "date-fns";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import axios from "axios";
+import { Deal } from "@/lib/types";
 
 export default function PropertyForm({ handleDealAdded }) {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			id: '',
-			address: '',
+			id: "",
+			address: "",
 			units: 1,
-			purchase_price: '',
-			down_payment_reserves: '',
-			unstabilized_projected_income: '',
-			current_realized_income: '',
-			sale_price: '',
-			gross_profit: '',
-			estimated_value: '',
-			rent_increase_percent: '',
-			refinance_valuation: '',
+			purchase_price: "",
+			down_payment_reserves: "",
+			unstabilized_projected_income: "",
+			current_realized_income: "",
+			sale_price: "",
+			gross_profit: "",
+			estimated_value: "",
+			rent_increase_percent: "",
+			refinance_valuation: "",
 			purchase_date: undefined,
 			sale_or_refinance_date: undefined,
 			major_capital_event: false,
-			estimated_irr: '',
+			estimated_irr: "",
 		},
 	});
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		try {
 			const property: Deal = buildPostDataForAddProperty(values, true);
-			await axios.post('/api/property', { property });
-			toast.success('Property saved successfully!');
+			await axios.post("/api/property", { property });
+			toast.success("Property saved successfully!");
 			form.reset();
 			await handleDealAdded();
 		} catch (error) {
-			console.error('Form submission error', error);
-			toast.error('Failed to submit the form. Please try again.');
+			console.error("Form submission error", error);
+			toast.error("Failed to submit the form. Please try again.");
 		}
 	}
 
@@ -70,9 +56,9 @@ export default function PropertyForm({ handleDealAdded }) {
 		<Form {...form}>
 			<form
 				onSubmit={form.handleSubmit(onSubmit, (errors) => {
-					console.error('Validation errors:', errors);
+					console.error("Validation errors:", errors);
 				})}
-				onError={(error) => console.log('Error!', error)}
+				onError={(error) => console.log("Error!", error)}
 				className="space-y-8 max-w-4xl py-2"
 			>
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -81,12 +67,9 @@ export default function PropertyForm({ handleDealAdded }) {
 						name="address"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Address</FormLabel>
+								<FormLabel>{DATA_KEYS.address}</FormLabel>
 								<FormControl>
-									<Input
-										placeholder="123 Fake Street, Anytown FS, 01234"
-										{...field}
-									/>
+									<Input placeholder="123 Fake Street, Anytown FS, 01234" {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -98,7 +81,7 @@ export default function PropertyForm({ handleDealAdded }) {
 						name="units"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Units</FormLabel>
+								<FormLabel>{DATA_KEYS.units}</FormLabel>
 								<FormControl>
 									<Input
 										type="number"
@@ -106,7 +89,7 @@ export default function PropertyForm({ handleDealAdded }) {
 										value={field.value}
 										onChange={(e) => {
 											const parsed = parseInt(e.target.value, 10);
-											field.onChange(isNaN(parsed) ? '' : parsed);
+											field.onChange(isNaN(parsed) ? "" : parsed);
 										}}
 									/>
 								</FormControl>
@@ -122,24 +105,17 @@ export default function PropertyForm({ handleDealAdded }) {
 						name="purchase_price"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Purchase Price</FormLabel>
+								<FormLabel>{DATA_KEYS.purchase_price}</FormLabel>
 								<FormControl>
 									<Input
 										type="text"
-										placeholder={'$1,000'}
+										placeholder={"$1,000"}
 										value={
-											field.value &&
-											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
-												? `$${Number(field.value.replace(/[^0-9.]/g, '')).toLocaleString()}`
-												: ''
+											field.value && !isNaN(Number(field.value.replace(/[^0-9.]/g, "")))
+												? `$${Number(field.value.replace(/[^0-9.]/g, "")).toLocaleString()}`
+												: ""
 										}
-										onChange={(e) =>
-											formatCurrencyOnChange(
-												'purchase_price',
-												e.target.value,
-												form
-											)
-										}
+										onChange={(e) => formatCurrencyOnChange("purchase_price", e.target.value, form)}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -152,30 +128,20 @@ export default function PropertyForm({ handleDealAdded }) {
 						name="purchase_date"
 						render={({ field }) => (
 							<FormItem className="flex flex-col">
-								<FormLabel>Purchase Date</FormLabel>
+								<FormLabel>{DATA_KEYS.purchase_date}</FormLabel>
 								<Popover>
 									<PopoverTrigger asChild>
 										<FormControl>
 											<Button
 												variant="outline"
-												className={cn(
-													' pl-3 text-left font-normal',
-													!field.value && 'text-muted-foreground'
-												)}
+												className={cn(" pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
 											>
-												{field.value ? (
-													format(field.value, 'MM/dd/yyyy')
-												) : (
-													<span>Pick a date</span>
-												)}
+												{field.value ? format(field.value, "MM/dd/yyyy") : <span>Pick a date</span>}
 												<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
 											</Button>
 										</FormControl>
 									</PopoverTrigger>
-									<PopoverContent
-										className="w-auto property-date p-0"
-										align="start"
-									>
+									<PopoverContent className="w-auto property-date p-0" align="start">
 										<Calendar
 											mode="single"
 											selected={field.value}
@@ -185,9 +151,8 @@ export default function PropertyForm({ handleDealAdded }) {
 											toYear={2025}
 											captionLayout="dropdown"
 											classNames={{
-												caption_dropdowns: 'flex gap-2 justify-center',
-												dropdown:
-													'border rounded px-2 py-1 text-sm bg-white dark:bg-zinc-900',
+												caption_dropdowns: "flex gap-2 justify-center",
+												dropdown: "border rounded px-2 py-1 text-sm bg-white dark:bg-zinc-900",
 											}}
 										/>
 									</PopoverContent>
@@ -202,24 +167,17 @@ export default function PropertyForm({ handleDealAdded }) {
 						name="down_payment_reserves"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Down Payment & Reserves</FormLabel>
+								<FormLabel>{DATA_KEYS.down_payment_reserves}</FormLabel>
 								<FormControl>
 									<Input
 										type="text"
-										placeholder={'$1,000'}
+										placeholder={"$1,000"}
 										value={
-											field.value &&
-											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
-												? `$${Number(field.value.replace(/[^0-9.]/g, '')).toLocaleString()}`
-												: ''
+											field.value && !isNaN(Number(field.value.replace(/[^0-9.]/g, "")))
+												? `$${Number(field.value.replace(/[^0-9.]/g, "")).toLocaleString()}`
+												: ""
 										}
-										onChange={(e) =>
-											formatCurrencyOnChange(
-												'down_payment_reserves',
-												e.target.value,
-												form
-											)
-										}
+										onChange={(e) => formatCurrencyOnChange("down_payment_reserves", e.target.value, form)}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -234,24 +192,17 @@ export default function PropertyForm({ handleDealAdded }) {
 						name="unstabilized_projected_income"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Unstabilized Income</FormLabel>
+								<FormLabel>{DATA_KEYS.unstabilized_projected_income}</FormLabel>
 								<FormControl>
 									<Input
 										type="text"
 										placeholder="Projected"
 										value={
-											field.value &&
-											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
-												? `$${Number(field.value.replace(/[^0-9.]/g, '')).toLocaleString()}`
-												: ''
+											field.value && !isNaN(Number(field.value.replace(/[^0-9.]/g, "")))
+												? `$${Number(field.value.replace(/[^0-9.]/g, "")).toLocaleString()}`
+												: ""
 										}
-										onChange={(e) =>
-											formatCurrencyOnChange(
-												'unstabilized_projected_income',
-												e.target.value,
-												form
-											)
-										}
+										onChange={(e) => formatCurrencyOnChange("unstabilized_projected_income", e.target.value, form)}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -263,24 +214,17 @@ export default function PropertyForm({ handleDealAdded }) {
 						name="current_realized_income"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Current Income</FormLabel>
+								<FormLabel>{DATA_KEYS.current_realized_income}</FormLabel>
 								<FormControl>
 									<Input
 										type="text"
 										placeholder="Realized"
 										value={
-											field.value &&
-											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
-												? `$${Number(field.value.replace(/[^0-9.]/g, '')).toLocaleString()}`
-												: ''
+											field.value && !isNaN(Number(field.value.replace(/[^0-9.]/g, "")))
+												? `$${Number(field.value.replace(/[^0-9.]/g, "")).toLocaleString()}`
+												: ""
 										}
-										onChange={(e) =>
-											formatCurrencyOnChange(
-												'current_realized_income',
-												e.target.value,
-												form
-											)
-										}
+										onChange={(e) => formatCurrencyOnChange("current_realized_income", e.target.value, form)}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -293,7 +237,7 @@ export default function PropertyForm({ handleDealAdded }) {
 						name="rent_increase_percent"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Rent Increase Percent</FormLabel>
+								<FormLabel>{DATA_KEYS.rent_increase_percent}</FormLabel>
 								<FormControl>
 									<Input type="text" placeholder="Increase %" {...field} />
 								</FormControl>
@@ -309,24 +253,17 @@ export default function PropertyForm({ handleDealAdded }) {
 						name="estimated_value"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Estimated Value</FormLabel>
+								<FormLabel>{DATA_KEYS.estimated_value}</FormLabel>
 								<FormControl>
 									<Input
 										type="text"
-										placeholder={'$1,000'}
+										placeholder={"$1,000"}
 										value={
-											field.value &&
-											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
-												? `$${Number(field.value.replace(/[^0-9.]/g, '')).toLocaleString()}`
-												: ''
+											field.value && !isNaN(Number(field.value.replace(/[^0-9.]/g, "")))
+												? `$${Number(field.value.replace(/[^0-9.]/g, "")).toLocaleString()}`
+												: ""
 										}
-										onChange={(e) =>
-											formatCurrencyOnChange(
-												'estimated_value',
-												e.target.value,
-												form
-											)
-										}
+										onChange={(e) => formatCurrencyOnChange("estimated_value", e.target.value, form)}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -338,24 +275,17 @@ export default function PropertyForm({ handleDealAdded }) {
 						name="sale_price"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Sale Price</FormLabel>
+								<FormLabel>{DATA_KEYS.sale_price}</FormLabel>
 								<FormControl>
 									<Input
 										type="text"
-										placeholder={'$1,000'}
+										placeholder={"$1,000"}
 										value={
-											field.value &&
-											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
-												? `$${Number(field.value.replace(/[^0-9.]/g, '')).toLocaleString()}`
-												: ''
+											field.value && !isNaN(Number(field.value.replace(/[^0-9.]/g, "")))
+												? `$${Number(field.value.replace(/[^0-9.]/g, "")).toLocaleString()}`
+												: ""
 										}
-										onChange={(e) =>
-											formatCurrencyOnChange(
-												'sale_price',
-												e.target.value,
-												form
-											)
-										}
+										onChange={(e) => formatCurrencyOnChange("sale_price", e.target.value, form)}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -368,24 +298,17 @@ export default function PropertyForm({ handleDealAdded }) {
 						name="gross_profit"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Gross Profit or Appreciation</FormLabel>
+								<FormLabel>{DATA_KEYS.gross_profit}</FormLabel>
 								<FormControl>
 									<Input
 										type="text"
-										placeholder={'$1,000'}
+										placeholder={"$1,000"}
 										value={
-											field.value &&
-											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
-												? `$${Number(field.value.replace(/[^0-9.]/g, '')).toLocaleString()}`
-												: ''
+											field.value && !isNaN(Number(field.value.replace(/[^0-9.]/g, "")))
+												? `$${Number(field.value.replace(/[^0-9.]/g, "")).toLocaleString()}`
+												: ""
 										}
-										onChange={(e) =>
-											formatCurrencyOnChange(
-												'gross_profit',
-												e.target.value,
-												form
-											)
-										}
+										onChange={(e) => formatCurrencyOnChange("gross_profit", e.target.value, form)}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -401,17 +324,11 @@ export default function PropertyForm({ handleDealAdded }) {
 						render={({ field }) => (
 							<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
 								<div className="space-y-0.5">
-									<FormLabel>Major Capital Event</FormLabel>
-									<FormDescription>
-										Did the property have a major capital event?
-									</FormDescription>
+									<FormLabel>{DATA_KEYS.major_capital_event}</FormLabel>
+									<FormDescription>Did the property have a major capital event?</FormDescription>
 								</div>
 								<FormControl>
-									<Switch
-										checked={field.value}
-										onCheckedChange={field.onChange}
-										aria-readonly
-									/>
+									<Switch checked={field.value} onCheckedChange={field.onChange} aria-readonly />
 								</FormControl>
 							</FormItem>
 						)}
@@ -422,30 +339,20 @@ export default function PropertyForm({ handleDealAdded }) {
 						name="sale_or_refinance_date"
 						render={({ field }) => (
 							<FormItem className="flex flex-col">
-								<FormLabel>Major Capital Event Date</FormLabel>
+								<FormLabel>{DATA_KEYS.sale_or_refinance_date}</FormLabel>
 								<Popover>
 									<PopoverTrigger asChild>
 										<FormControl>
 											<Button
-												variant={'outline'}
-												className={cn(
-													' pl-3 text-left font-normal',
-													!field.value && 'text-muted-foreground'
-												)}
+												variant={"outline"}
+												className={cn(" pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
 											>
-												{field.value ? (
-													format(field.value, 'MM/dd/yyyy')
-												) : (
-													<span>Pick a date</span>
-												)}
+												{field.value ? format(field.value, "MM/dd/yyyy") : <span>Pick a date</span>}
 												<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
 											</Button>
 										</FormControl>
 									</PopoverTrigger>
-									<PopoverContent
-										className="w-auto p-0 property-date"
-										align="start"
-									>
+									<PopoverContent className="w-auto p-0 property-date" align="start">
 										<Calendar
 											mode="single"
 											selected={field.value}
@@ -454,16 +361,13 @@ export default function PropertyForm({ handleDealAdded }) {
 											toYear={2025}
 											captionLayout="dropdown"
 											classNames={{
-												caption_dropdowns: 'flex gap-2 justify-center',
-												dropdown:
-													'border rounded px-2 py-1 text-sm bg-white dark:bg-zinc-900',
+												caption_dropdowns: "flex gap-2 justify-center",
+												dropdown: "border rounded px-2 py-1 text-sm bg-white dark:bg-zinc-900",
 											}}
 										/>
 									</PopoverContent>
 								</Popover>
-								<FormDescription>
-									Date of major capital event, sale or refinance.
-								</FormDescription>
+								<FormDescription>Date of major capital event, sale or refinance.</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -476,7 +380,7 @@ export default function PropertyForm({ handleDealAdded }) {
 						name="estimated_irr"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Estimated IRR %</FormLabel>
+								<FormLabel>{DATA_KEYS.estimated_irr}</FormLabel>
 								<FormControl>
 									<Input type="text" placeholder="100%" {...field} />
 								</FormControl>
@@ -494,20 +398,13 @@ export default function PropertyForm({ handleDealAdded }) {
 								<FormControl>
 									<Input
 										type="text"
-										placeholder={'$1,000'}
+										placeholder={"$1,000"}
 										value={
-											field.value &&
-											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
-												? `$${Number(field.value.replace(/[^0-9.]/g, '')).toLocaleString()}`
-												: ''
+											field.value && !isNaN(Number(field.value.replace(/[^0-9.]/g, "")))
+												? `$${Number(field.value.replace(/[^0-9.]/g, "")).toLocaleString()}`
+												: ""
 										}
-										onChange={(e) =>
-											formatCurrencyOnChange(
-												'refinance_valuation',
-												e.target.value,
-												form
-											)
-										}
+										onChange={(e) => formatCurrencyOnChange("refinance_valuation", e.target.value, form)}
 									/>
 								</FormControl>
 								<FormMessage />
