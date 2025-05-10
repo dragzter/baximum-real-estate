@@ -27,6 +27,8 @@ export default function PropertyForm({ handleDealAdded }) {
 			down_payment_reserves: "",
 			unstabilized_projected_income: "",
 			current_realized_income: "",
+			number_units_stabilized: 0,
+			number_units_unstabilized: 0,
 			sale_price: "",
 			gross_profit: "",
 			estimated_value: "",
@@ -42,6 +44,7 @@ export default function PropertyForm({ handleDealAdded }) {
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		try {
 			const property: Deal = buildPostDataForAddProperty(values, true);
+			debugger;
 			await axios.post("/api/property", { property });
 			toast.success("Property saved successfully!");
 			form.reset();
@@ -61,7 +64,7 @@ export default function PropertyForm({ handleDealAdded }) {
 				onError={(error) => console.log("Error!", error)}
 				className="space-y-8 max-w-4xl py-2"
 			>
-				<div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+				<div className="grid grid-cols-1 gap-3">
 					<FormField
 						control={form.control}
 						name="address"
@@ -75,7 +78,8 @@ export default function PropertyForm({ handleDealAdded }) {
 							</FormItem>
 						)}
 					/>
-
+				</div>
+				<div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
 					<FormField
 						control={form.control}
 						name="units"
@@ -86,6 +90,48 @@ export default function PropertyForm({ handleDealAdded }) {
 									<Input
 										type="number"
 										placeholder="Units"
+										value={field.value}
+										onChange={(e) => {
+											const parsed = parseInt(e.target.value, 10);
+											field.onChange(isNaN(parsed) ? "" : parsed);
+										}}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="number_units_stabilized"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>{DATA_KEYS.number_units_stabilized}</FormLabel>
+								<FormControl>
+									<Input
+										type="number"
+										placeholder="Stabilized Units"
+										value={field.value}
+										onChange={(e) => {
+											const parsed = parseInt(e.target.value, 10);
+											field.onChange(isNaN(parsed) ? "" : parsed);
+										}}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="number_units_unstabilized"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>{DATA_KEYS.number_units_unstabilized}</FormLabel>
+								<FormControl>
+									<Input
+										type="number"
+										placeholder="Unstabilized Units"
 										value={field.value}
 										onChange={(e) => {
 											const parsed = parseInt(e.target.value, 10);

@@ -76,6 +76,38 @@ export function PropertyTable({ properties, handleEditProperty }) {
 				cell: ({ row }) => row.getValue("units"),
 			},
 			{
+				accessorKey: "number_units_stabilized",
+				header: ({ column }) => {
+					return (
+						<Button
+							style={{ paddingLeft: 0 }}
+							variant="ghost"
+							onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+						>
+							{DATA_KEYS.number_units_stabilized}
+							<ArrowUpDown />
+						</Button>
+					);
+				},
+				cell: ({ row }) => row.getValue("number_units_stabilized"),
+			},
+			{
+				accessorKey: "number_units_unstabilized",
+				header: ({ column }) => {
+					return (
+						<Button
+							style={{ paddingLeft: 0 }}
+							variant="ghost"
+							onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+						>
+							{DATA_KEYS.number_units_unstabilized}
+							<ArrowUpDown />
+						</Button>
+					);
+				},
+				cell: ({ row }) => row.getValue("number_units_unstabilized"),
+			},
+			{
 				accessorKey: "purchase_price",
 				header: ({ column }) => (
 					<Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>

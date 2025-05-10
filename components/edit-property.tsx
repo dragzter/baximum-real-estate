@@ -1,37 +1,22 @@
-'use client';
+"use client";
 
-import { toast } from 'sonner';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import {
-	buildPostDataForAddProperty,
-	cn,
-	DATA_KEYS,
-	formatCurrencyOnChange,
-	formSchema,
-	VIEWS,
-} from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { format } from 'date-fns';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { Calendar as CalendarIcon } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
-import { Deal } from '@/lib/types';
-import { useEffect, useRef, useState } from 'react';
-import { useDealsStore, useGeneralAppStateStore } from '@/lib/store';
-import { isEqual } from 'lodash-es';
+import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { buildPostDataForAddProperty, cn, DATA_KEYS, formatCurrencyOnChange, formSchema, VIEWS } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { format } from "date-fns";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Deal } from "@/lib/types";
+import { useEffect, useRef, useState } from "react";
+import { useDealsStore, useGeneralAppStateStore } from "@/lib/store";
+import { isEqual } from "lodash-es";
 
 export default function EditPropertyForm({ editId }) {
 	const getProperty = useDealsStore((s) => s.getProperty);
@@ -53,21 +38,23 @@ export default function EditPropertyForm({ editId }) {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			address: '',
+			address: "",
 			units: 1,
-			purchase_price: '',
-			down_payment_reserves: '',
-			unstabilized_projected_income: '',
-			current_realized_income: '',
-			sale_price: '',
-			gross_profit: '',
-			estimated_value: '',
-			rent_increase_percent: '',
-			refinance_valuation: '',
+			number_units_stabilized: 0,
+			number_units_unstabilized: 0,
+			purchase_price: "",
+			down_payment_reserves: "",
+			unstabilized_projected_income: "",
+			current_realized_income: "",
+			sale_price: "",
+			gross_profit: "",
+			estimated_value: "",
+			rent_increase_percent: "",
+			refinance_valuation: "",
 			purchase_date: undefined,
 			sale_or_refinance_date: undefined,
 			major_capital_event: false,
-			estimated_irr: '',
+			estimated_irr: "",
 		},
 	});
 
@@ -75,12 +62,8 @@ export default function EditPropertyForm({ editId }) {
 		if (property) {
 			const fProperty = {
 				...property,
-				purchase_date: property.purchase_date
-					? new Date(property.purchase_date)
-					: undefined,
-				sale_or_refinance_date: property.sale_or_refinance_date
-					? new Date(property.sale_or_refinance_date)
-					: undefined,
+				purchase_date: property.purchase_date ? new Date(property.purchase_date) : undefined,
+				sale_or_refinance_date: property.sale_or_refinance_date ? new Date(property.sale_or_refinance_date) : undefined,
 			};
 
 			const sub = form.watch((value) => {
@@ -97,12 +80,8 @@ export default function EditPropertyForm({ editId }) {
 		if (property) {
 			form.reset({
 				...property,
-				purchase_date: property.purchase_date
-					? new Date(property.purchase_date)
-					: undefined,
-				sale_or_refinance_date: property.sale_or_refinance_date
-					? new Date(property.sale_or_refinance_date)
-					: undefined,
+				purchase_date: property.purchase_date ? new Date(property.purchase_date) : undefined,
+				sale_or_refinance_date: property.sale_or_refinance_date ? new Date(property.sale_or_refinance_date) : undefined,
 			});
 		}
 	}, [property]);
@@ -114,7 +93,7 @@ export default function EditPropertyForm({ editId }) {
 			await updateDeal(property.id, property);
 
 			console.log(property);
-			toast.success('Property updated successfully!');
+			toast.success("Property updated successfully!");
 
 			setTimeout(() => {
 				setView(VIEWS.property_list);
@@ -122,8 +101,8 @@ export default function EditPropertyForm({ editId }) {
 
 			//form.reset();
 		} catch (error) {
-			console.error('Form submission error', error);
-			toast.error('Failed to submit the form. Please try again.');
+			console.error("Form submission error", error);
+			toast.error("Failed to submit the form. Please try again.");
 		}
 	}
 
@@ -131,9 +110,9 @@ export default function EditPropertyForm({ editId }) {
 		<Form {...form}>
 			<form
 				onSubmit={form.handleSubmit(onSubmit, (errors) => {
-					console.error('Validation errors:', errors);
+					console.error("Validation errors:", errors);
 				})}
-				onError={(error) => console.log('Error!', error)}
+				onError={(error) => console.log("Error!", error)}
 				className="space-y-8 max-w-4xl py-2"
 			>
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -144,22 +123,20 @@ export default function EditPropertyForm({ editId }) {
 							<FormItem>
 								<FormLabel>Address</FormLabel>
 								<FormControl>
-									<Input
-										placeholder="123 Fake Street, Anytown FS, 01234"
-										{...field}
-									/>
+									<Input placeholder="123 Fake Street, Anytown FS, 01234" {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
 						)}
 					/>
-
+				</div>
+				<div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
 					<FormField
 						control={form.control}
 						name="units"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Units</FormLabel>
+								<FormLabel>{DATA_KEYS.units}</FormLabel>
 								<FormControl>
 									<Input
 										type="number"
@@ -167,7 +144,49 @@ export default function EditPropertyForm({ editId }) {
 										value={field.value}
 										onChange={(e) => {
 											const parsed = parseInt(e.target.value, 10);
-											field.onChange(isNaN(parsed) ? '' : parsed);
+											field.onChange(isNaN(parsed) ? "" : parsed);
+										}}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="number_units_stabilized"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>{DATA_KEYS.number_units_stabilized}</FormLabel>
+								<FormControl>
+									<Input
+										type="number"
+										placeholder="Stabilized Units"
+										value={field.value}
+										onChange={(e) => {
+											const parsed = parseInt(e.target.value, 10);
+											field.onChange(isNaN(parsed) ? "" : parsed);
+										}}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="number_units_unstabilized"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>{DATA_KEYS.number_units_unstabilized}</FormLabel>
+								<FormControl>
+									<Input
+										type="number"
+										placeholder="Unstabilized Units"
+										value={field.value}
+										onChange={(e) => {
+											const parsed = parseInt(e.target.value, 10);
+											field.onChange(isNaN(parsed) ? "" : parsed);
 										}}
 									/>
 								</FormControl>
@@ -187,20 +206,13 @@ export default function EditPropertyForm({ editId }) {
 								<FormControl>
 									<Input
 										type="text"
-										placeholder={'$1,000'}
+										placeholder={"$1,000"}
 										value={
-											field.value &&
-											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
-												? `$${Number(field.value.replace(/[^0-9.]/g, '')).toLocaleString()}`
-												: ''
+											field.value && !isNaN(Number(field.value.replace(/[^0-9.]/g, "")))
+												? `$${Number(field.value.replace(/[^0-9.]/g, "")).toLocaleString()}`
+												: ""
 										}
-										onChange={(e) =>
-											formatCurrencyOnChange(
-												'purchase_price',
-												e.target.value,
-												form
-											)
-										}
+										onChange={(e) => formatCurrencyOnChange("purchase_price", e.target.value, form)}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -219,24 +231,14 @@ export default function EditPropertyForm({ editId }) {
 										<FormControl>
 											<Button
 												variant="outline"
-												className={cn(
-													' pl-3 text-left font-normal',
-													!field.value && 'text-muted-foreground'
-												)}
+												className={cn(" pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
 											>
-												{field.value ? (
-													format(field.value, 'MM/dd/yyyy')
-												) : (
-													<span>Pick a date</span>
-												)}
+												{field.value ? format(field.value, "MM/dd/yyyy") : <span>Pick a date</span>}
 												<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
 											</Button>
 										</FormControl>
 									</PopoverTrigger>
-									<PopoverContent
-										className="w-auto property-date p-0"
-										align="start"
-									>
+									<PopoverContent className="w-auto property-date p-0" align="start">
 										<Calendar
 											mode="single"
 											selected={field.value}
@@ -247,9 +249,8 @@ export default function EditPropertyForm({ editId }) {
 											month={field.value ?? undefined}
 											captionLayout="dropdown"
 											classNames={{
-												caption_dropdowns: 'flex gap-2 justify-center',
-												dropdown:
-													'border rounded px-2 py-1 text-sm bg-white dark:bg-zinc-900',
+												caption_dropdowns: "flex gap-2 justify-center",
+												dropdown: "border rounded px-2 py-1 text-sm bg-white dark:bg-zinc-900",
 											}}
 										/>
 									</PopoverContent>
@@ -268,20 +269,13 @@ export default function EditPropertyForm({ editId }) {
 								<FormControl>
 									<Input
 										type="text"
-										placeholder={'$1,000'}
+										placeholder={"$1,000"}
 										value={
-											field.value &&
-											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
-												? `$${Number(field.value.replace(/[^0-9.]/g, '')).toLocaleString()}`
-												: ''
+											field.value && !isNaN(Number(field.value.replace(/[^0-9.]/g, "")))
+												? `$${Number(field.value.replace(/[^0-9.]/g, "")).toLocaleString()}`
+												: ""
 										}
-										onChange={(e) =>
-											formatCurrencyOnChange(
-												'down_payment_reserves',
-												e.target.value,
-												form
-											)
-										}
+										onChange={(e) => formatCurrencyOnChange("down_payment_reserves", e.target.value, form)}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -302,18 +296,11 @@ export default function EditPropertyForm({ editId }) {
 										type="text"
 										placeholder="Projected"
 										value={
-											field.value &&
-											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
-												? `$${Number(field.value.replace(/[^0-9.]/g, '')).toLocaleString()}`
-												: ''
+											field.value && !isNaN(Number(field.value.replace(/[^0-9.]/g, "")))
+												? `$${Number(field.value.replace(/[^0-9.]/g, "")).toLocaleString()}`
+												: ""
 										}
-										onChange={(e) =>
-											formatCurrencyOnChange(
-												'unstabilized_projected_income',
-												e.target.value,
-												form
-											)
-										}
+										onChange={(e) => formatCurrencyOnChange("unstabilized_projected_income", e.target.value, form)}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -331,18 +318,11 @@ export default function EditPropertyForm({ editId }) {
 										type="text"
 										placeholder="Realized"
 										value={
-											field.value &&
-											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
-												? `$${Number(field.value.replace(/[^0-9.]/g, '')).toLocaleString()}`
-												: ''
+											field.value && !isNaN(Number(field.value.replace(/[^0-9.]/g, "")))
+												? `$${Number(field.value.replace(/[^0-9.]/g, "")).toLocaleString()}`
+												: ""
 										}
-										onChange={(e) =>
-											formatCurrencyOnChange(
-												'current_realized_income',
-												e.target.value,
-												form
-											)
-										}
+										onChange={(e) => formatCurrencyOnChange("current_realized_income", e.target.value, form)}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -375,20 +355,13 @@ export default function EditPropertyForm({ editId }) {
 								<FormControl>
 									<Input
 										type="text"
-										placeholder={'$1,000'}
+										placeholder={"$1,000"}
 										value={
-											field.value &&
-											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
-												? `$${Number(field.value.replace(/[^0-9.]/g, '')).toLocaleString()}`
-												: ''
+											field.value && !isNaN(Number(field.value.replace(/[^0-9.]/g, "")))
+												? `$${Number(field.value.replace(/[^0-9.]/g, "")).toLocaleString()}`
+												: ""
 										}
-										onChange={(e) =>
-											formatCurrencyOnChange(
-												'estimated_value',
-												e.target.value,
-												form
-											)
-										}
+										onChange={(e) => formatCurrencyOnChange("estimated_value", e.target.value, form)}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -404,20 +377,13 @@ export default function EditPropertyForm({ editId }) {
 								<FormControl>
 									<Input
 										type="text"
-										placeholder={'$1,000'}
+										placeholder={"$1,000"}
 										value={
-											field.value &&
-											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
-												? `$${Number(field.value.replace(/[^0-9.]/g, '')).toLocaleString()}`
-												: ''
+											field.value && !isNaN(Number(field.value.replace(/[^0-9.]/g, "")))
+												? `$${Number(field.value.replace(/[^0-9.]/g, "")).toLocaleString()}`
+												: ""
 										}
-										onChange={(e) =>
-											formatCurrencyOnChange(
-												'sale_price',
-												e.target.value,
-												form
-											)
-										}
+										onChange={(e) => formatCurrencyOnChange("sale_price", e.target.value, form)}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -434,20 +400,13 @@ export default function EditPropertyForm({ editId }) {
 								<FormControl>
 									<Input
 										type="text"
-										placeholder={'$1,000'}
+										placeholder={"$1,000"}
 										value={
-											field.value &&
-											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
-												? `$${Number(field.value.replace(/[^0-9.]/g, '')).toLocaleString()}`
-												: ''
+											field.value && !isNaN(Number(field.value.replace(/[^0-9.]/g, "")))
+												? `$${Number(field.value.replace(/[^0-9.]/g, "")).toLocaleString()}`
+												: ""
 										}
-										onChange={(e) =>
-											formatCurrencyOnChange(
-												'gross_profit',
-												e.target.value,
-												form
-											)
-										}
+										onChange={(e) => formatCurrencyOnChange("gross_profit", e.target.value, form)}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -464,16 +423,10 @@ export default function EditPropertyForm({ editId }) {
 							<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
 								<div className="space-y-0.5">
 									<FormLabel>Major Capital Event</FormLabel>
-									<FormDescription>
-										Did the property have a major capital event?
-									</FormDescription>
+									<FormDescription>Did the property have a major capital event?</FormDescription>
 								</div>
 								<FormControl>
-									<Switch
-										checked={field.value}
-										onCheckedChange={field.onChange}
-										aria-readonly
-									/>
+									<Switch checked={field.value} onCheckedChange={field.onChange} aria-readonly />
 								</FormControl>
 							</FormItem>
 						)}
@@ -489,25 +442,15 @@ export default function EditPropertyForm({ editId }) {
 									<PopoverTrigger asChild>
 										<FormControl>
 											<Button
-												variant={'outline'}
-												className={cn(
-													' pl-3 text-left font-normal',
-													!field.value && 'text-muted-foreground'
-												)}
+												variant={"outline"}
+												className={cn(" pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
 											>
-												{field.value ? (
-													format(field.value, 'MM/dd/yyyy')
-												) : (
-													<span>Pick a date</span>
-												)}
+												{field.value ? format(field.value, "MM/dd/yyyy") : <span>Pick a date</span>}
 												<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
 											</Button>
 										</FormControl>
 									</PopoverTrigger>
-									<PopoverContent
-										className="w-auto p-0 property-date"
-										align="start"
-									>
+									<PopoverContent className="w-auto p-0 property-date" align="start">
 										<Calendar
 											mode="single"
 											selected={field.value}
@@ -517,16 +460,13 @@ export default function EditPropertyForm({ editId }) {
 											captionLayout="dropdown"
 											month={field.value ?? undefined}
 											classNames={{
-												caption_dropdowns: 'flex gap-2 justify-center',
-												dropdown:
-													'border rounded px-2 py-1 text-sm bg-white dark:bg-zinc-900',
+												caption_dropdowns: "flex gap-2 justify-center",
+												dropdown: "border rounded px-2 py-1 text-sm bg-white dark:bg-zinc-900",
 											}}
 										/>
 									</PopoverContent>
 								</Popover>
-								<FormDescription>
-									Date of major capital event, sale or refinance.
-								</FormDescription>
+								<FormDescription>Date of major capital event, sale or refinance.</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -557,20 +497,13 @@ export default function EditPropertyForm({ editId }) {
 								<FormControl>
 									<Input
 										type="text"
-										placeholder={'$1,000'}
+										placeholder={"$1,000"}
 										value={
-											field.value &&
-											!isNaN(Number(field.value.replace(/[^0-9.]/g, '')))
-												? `$${Number(field.value.replace(/[^0-9.]/g, '')).toLocaleString()}`
-												: ''
+											field.value && !isNaN(Number(field.value.replace(/[^0-9.]/g, "")))
+												? `$${Number(field.value.replace(/[^0-9.]/g, "")).toLocaleString()}`
+												: ""
 										}
-										onChange={(e) =>
-											formatCurrencyOnChange(
-												'refinance_valuation',
-												e.target.value,
-												form
-											)
-										}
+										onChange={(e) => formatCurrencyOnChange("refinance_valuation", e.target.value, form)}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -579,13 +512,11 @@ export default function EditPropertyForm({ editId }) {
 					/>
 				</div>
 
-				<Button disabled={dataIsUnchanged} type="submit" className={'cursor-pointer'}>
+				<Button disabled={dataIsUnchanged} type="submit" className={"cursor-pointer"}>
 					Edit Property
 				</Button>
 				{dataIsUnchanged && (
-					<p className={'text-sm mt-2 text-rose-500  ms-4 inline-block'}>
-						Modify at least one value.
-					</p>
+					<p className={"text-sm mt-2 text-rose-500  ms-4 inline-block"}>Modify at least one value.</p>
 				)}
 			</form>
 		</Form>

@@ -361,6 +361,14 @@ export default function Dashboard() {
 										{selectedProperty?.sale_price ?? "N/A"}
 									</div>
 									<div>
+										Stabilized Units: <br />
+										{selectedProperty?.number_units_stabilized ?? "N/A"}
+									</div>
+									<div>
+										Unstabilized Units: <br />
+										{selectedProperty?.number_units_unstabilized ?? "N/A"}
+									</div>
+									<div>
 										Gross Profit: <br />
 										{selectedProperty?.gross_profit ?? "N/A"}
 									</div>

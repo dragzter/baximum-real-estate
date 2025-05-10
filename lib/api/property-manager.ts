@@ -1,7 +1,7 @@
-import connect from '@/lib/db/connect';
-import { ApiResponse, Deal, DealPatch } from '@/lib/types';
-import PropertyModel from '@/lib/db/schema/property';
-import { DeleteResult } from 'mongoose';
+import connect from "@/lib/db/connect";
+import { ApiResponse, Deal, DealPatch } from "@/lib/types";
+import PropertyModel from "@/lib/db/schema/property";
+import { DeleteResult } from "mongoose";
 
 export function propertyManager(debug = false) {
 	async function c() {
@@ -23,34 +23,31 @@ export function propertyManager(debug = false) {
 	 * are out of scope for the time being.
 	 * @param p
 	 */
-	async function s(
-		p: Deal
-	): Promise<ApiResponse<{ existingProperty: Deal } | { newProperty: Deal }>> {
+	async function s(p: Deal): Promise<ApiResponse<{ existingProperty: Deal } | { newProperty: Deal }>> {
 		try {
 			await c();
 
 			const existing = await PropertyModel.findOne({
-				address: { $regex: new RegExp(p.address, 'i') },
+				address: { $regex: new RegExp(p.address, "i") },
 			});
 
 			if (existing) {
 				return {
 					success: false,
-					message:
-						'Property with this address exists. The existing property was attached to this' +
-						' response.',
+					message: "Property with this address exists. The existing property was attached to this" + " response.",
 					data: {
 						existingProperty: existing as Deal,
 					},
 				};
 			}
 
+			console.log("Property: ", p);
 			const _property = new PropertyModel(p);
 			await _property.save();
 
 			return {
 				success: true,
-				message: 'Property saved successfully.',
+				message: "Property saved successfully.",
 				data: {
 					newProperty: _property as Deal,
 				},
@@ -60,7 +57,7 @@ export function propertyManager(debug = false) {
 			return {
 				success: false,
 				error: err,
-				message: 'Save failed.  Read the error or the server console for more information.',
+				message: "Save failed.  Read the error or the server console for more information.",
 			};
 		}
 	}
@@ -70,18 +67,15 @@ export function propertyManager(debug = false) {
 	 * @param id
 	 * @param updateData
 	 */
-	async function u(
-		id: string,
-		updateData: DealPatch
-	): Promise<ApiResponse<{ updatedRecord: Deal }>> {
+	async function u(id: string, updateData: DealPatch): Promise<ApiResponse<{ updatedRecord: Deal }>> {
 		try {
 			await c(); // Connect if necessary
 
-			console.log('handler update', updateData);
+			console.log("handler update", updateData);
 
 			const single = await PropertyModel.findOne({ id });
 
-			console.log('single', single);
+			console.log("single", single);
 
 			const property = await PropertyModel.findOneAndUpdate(
 				{ id }, // We search on the user defined ID - defined at create time (in the form).
@@ -91,7 +85,7 @@ export function propertyManager(debug = false) {
 
 			if (property) {
 				return {
-					message: 'Update successful.',
+					message: "Update successful.",
 					success: true,
 					data: {
 						updatedRecord: property as Deal,
@@ -100,15 +94,14 @@ export function propertyManager(debug = false) {
 			} else {
 				return {
 					success: false,
-					message: 'Update failed.',
+					message: "Update failed.",
 				};
 			}
 		} catch (err) {
 			_debug(err);
 			return {
 				success: false,
-				message:
-					'Update failed.  Read the error or read the server console for more information.',
+				message: "Update failed.  Read the error or read the server console for more information.",
 				error: err,
 			};
 		}
@@ -127,7 +120,7 @@ export function propertyManager(debug = false) {
 
 			return {
 				success: true,
-				message: 'Property deleted successfully.',
+				message: "Property deleted successfully.",
 				data: {
 					query: resp as DeleteResult,
 				},
@@ -138,7 +131,7 @@ export function propertyManager(debug = false) {
 			return {
 				success: false,
 				error: err,
-				message: 'Delete unsuccessful',
+				message: "Delete unsuccessful",
 			};
 		}
 	}
@@ -172,14 +165,12 @@ export function propertyManager(debug = false) {
 		try {
 			await c();
 
-			const property = (await PropertyModel.findOne({ id })
-				.lean()
-				.exec()) as unknown as Deal | null;
+			const property = (await PropertyModel.findOne({ id }).lean().exec()) as unknown as Deal | null;
 
 			if (!property) {
 				return {
 					success: false,
-					message: 'Property not found.',
+					message: "Property not found.",
 				};
 			}
 
@@ -196,7 +187,7 @@ export function propertyManager(debug = false) {
 
 			return {
 				success: false,
-				message: 'There was a problem with the GET request.',
+				message: "There was a problem with the GET request.",
 				error: err,
 			};
 		}

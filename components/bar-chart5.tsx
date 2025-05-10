@@ -30,8 +30,8 @@ export default function PurchaseVsSaleChart({ properties }: Props) {
 						<YAxis tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
 						<Tooltip formatter={(val: number) => `$${val.toLocaleString()}`} />
 						<Legend verticalAlign="bottom" wrapperStyle={{ bottom: 0 }} />
-						<Bar dataKey="purchase" fill="#60a5fa" name="Purchase Price" />
-						<Bar dataKey="sale" fill="#34d399" name="Sale Price" />
+						<Bar dataKey="purchase" fill="#60a5fa" name="Value at Purchase" />
+						<Bar dataKey="sale" fill="#34d399" name="Value at Refinance" />
 					</BarChart>
 				</ResponsiveContainer>
 			</CardContent>

@@ -12,6 +12,8 @@ export type Deal = {
 	estimated_irr?: string;
 	sale_price?: string;
 	gross_profit?: string;
+	number_units_stabilized?: number;
+	number_units_unstabilized?: number;
 	sale_or_refinance_date?: string;
 	refinance_valuation?: string;
 	estimated_value?: string;
