@@ -15,6 +15,7 @@ export function RentIncreaseChart({ data }: Props) {
 	}));
 
 	const maxIncrease = Math.max(...chartData.map((d) => d.increase));
+	const minIncrease = Math.min(...chartData.map((d) => d.increase));
 
 	return (
 		<Card className="w-full">
@@ -24,7 +25,11 @@ export function RentIncreaseChart({ data }: Props) {
 			<CardContent className="h-[500px]">
 				<ResponsiveContainer width="100%" height="100%">
 					<BarChart data={chartData} layout="vertical" margin={{ top: 20, right: 50, left: 20, bottom: 60 }}>
-						<XAxis type="number" domain={[0, Math.ceil(maxIncrease + 10)]} tickFormatter={(val) => `${val}%`} />
+						<XAxis
+							type="number"
+							domain={[minIncrease - 20, Math.ceil(maxIncrease + 10)]}
+							tickFormatter={(val) => `${val}%`}
+						/>
 						<YAxis
 							dataKey="address"
 							type="category"
@@ -64,8 +69,8 @@ export function RentIncreaseChart({ data }: Props) {
 							}}
 						/>
 						<Tooltip formatter={(value: number) => `${value}%`} />
-						<Bar dataKey="increase" fill="#8884d8">
-							<LabelList dataKey="increase" position="right" formatter={(val) => `${val}%`} />
+						<Bar dataKey="increase" fill="#29316e">
+							<LabelList fontSize={12} dataKey="increase" position="right" formatter={(val) => `${val}%`} />
 						</Bar>
 					</BarChart>
 				</ResponsiveContainer>

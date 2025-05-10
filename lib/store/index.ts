@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-import { BaxUser, Deal, DealPatch } from '@/lib/types';
-import axios from 'axios';
-import { VIEWS } from '@/lib/utils';
+import { create } from "zustand";
+import { BaxUser, Deal, DealPatch } from "@/lib/types";
+import axios from "axios";
+import { VIEWS } from "@/lib/utils";
 
 interface UserState {
 	user: BaxUser;
@@ -52,7 +52,7 @@ export const useUserStore = create<UserState>((set) => ({
 
 export const useGeneralAppStateStore = create<GeneralState>((set) => ({
 	isDashboard: false,
-	view: VIEWS.property_list,
+	view: VIEWS.dashboard,
 	setIsDashboard: (s: boolean) => set({ isDashboard: s }),
 	setView: (s: (typeof VIEWS)[keyof typeof VIEWS]) => set({ view: s }),
 }));
@@ -64,7 +64,7 @@ export const useDealsStore = create<DealsState>((set, get) => ({
 	getLoading: false,
 	updateDeal: async (id: string, updateData: DealPatch) => {
 		try {
-			const res = await axios.patch('/api/property/update/' + id, { updateData });
+			const res = await axios.patch("/api/property/update/" + id, { updateData });
 
 			if (res.data.success) {
 				get().getProperties();
@@ -77,7 +77,7 @@ export const useDealsStore = create<DealsState>((set, get) => ({
 		try {
 			set({ deleteLoading: true });
 
-			const res = await axios.delete('/api/property/' + id);
+			const res = await axios.delete("/api/property/" + id);
 
 			if (res.data.success) {
 				set((state) => ({
@@ -94,7 +94,7 @@ export const useDealsStore = create<DealsState>((set, get) => ({
 		try {
 			set({ deleteLoading: true });
 
-			const res = await axios.get('/api/property/' + id);
+			const res = await axios.get("/api/property/" + id);
 
 			if (res.data.success) {
 				get().getProperties();
@@ -112,7 +112,7 @@ export const useDealsStore = create<DealsState>((set, get) => ({
 	getProperties: async () => {
 		try {
 			set({ loading: true });
-			const res = await axios.get('/api/property');
+			const res = await axios.get("/api/property");
 			const { properties } = res.data.result.data;
 
 			set({ properties });

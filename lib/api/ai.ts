@@ -1,11 +1,11 @@
 // lib/ai-controller.ts
-import OpenAI from 'openai';
+import OpenAI from "openai";
 
 interface AiControllerOptions {
 	model?: string;
 }
 
-type Message = { role: 'user' | 'assistant' | 'system'; content: string };
+type Message = { role: "user" | "assistant" | "system"; content: string };
 
 // export class AiController {
 //   private openai: OpenAI;
@@ -106,16 +106,19 @@ export class AiController {
 	constructor(options: AiControllerOptions = {}) {
 		this.openai = new OpenAI({
 			apiKey: process.env.OPEN_AI_API_KEY!,
+			//apiKey: process.env.XAI_API_KEY!,
+			//baseURL: "https://api.x.ai/v1",
 		});
-		this.model = options.model || 'gpt-3.5-turbo';
+		// this.model = options.model || 'gpt-3.5-turbo';
+		this.model = options.model || "o4-mini";
 
 		this.systemMessage = {
-			role: 'system',
+			role: "system",
 			content:
-				'You are a professional real estate investor and advisor. You are very good at analyzing real estate deals and providing advice to investors.',
+				"You are a professional real estate investor and advisor. You are very good at analyzing real estate deals and providing advice to investors.",
 		};
 		this.memory = [this.systemMessage];
-		this.summary = '';
+		this.summary = "";
 		this.maxMemorySlots = 22;
 	}
 
@@ -125,7 +128,7 @@ export class AiController {
 
 		const summaryPrompt: string = `
       Summarize the following conversation briefly, preserving important context and critical facts like dollar value, dates, names, places, anything critical should always be included in the summary even if it gets somewhat long:
-      ${this.memory.map((m) => `${m.role === 'user' ? 'User' : 'AI'}: ${m.content}`).join('\n')}
+      ${this.memory.map((m) => `${m.role === "user" ? "User" : "AI"}: ${m.content}`).join("\n")}
       ${userPrompt.content}`;
 
 		const summaryResponse = await this.openai.chat.completions.create({
@@ -133,26 +136,26 @@ export class AiController {
 			temperature: 0.2,
 			messages: [
 				{
-					role: 'system',
-					content: 'You summarize conversations very concisely.',
+					role: "system",
+					content: "You summarize conversations very concisely.",
 				},
-				{ role: 'user', content: summaryPrompt },
+				{ role: "user", content: summaryPrompt },
 			],
 		});
 
-		this.summary = summaryResponse.choices[0]?.message?.content || '';
+		this.summary = summaryResponse.choices[0]?.message?.content || "";
 	}
 
 	async ask2(userPrompt: string): Promise<string> {
 		const messages: Message[] = [
 			{
-				role: 'system',
+				role: "system",
 				content: `
-          You're a helpful real estate professional that examines real estate for a living and is able to provide helpful advice. Be very brief in your responses only giving essential info.
+          You're a helpful real estate professional that examines real estate data and is able to provide helpful advice. Be very brief in your responses only giving essential info.
       `.trim(),
 			},
 			{
-				role: 'user',
+				role: "user",
 				content: userPrompt,
 			},
 		];
@@ -160,21 +163,20 @@ export class AiController {
 		const response = await this.openai.chat.completions.create({
 			model: this.model,
 			messages,
+			stream: false,
 		});
 
-		console.log(messages);
-
-		return response.choices[0]?.message?.content || '';
+		return response.choices[0]?.message?.content || "";
 	}
 
 	async ask(userPrompt: string): Promise<string> {
-		await this.summarize({ role: 'user', content: userPrompt });
+		await this.summarize({ role: "user", content: userPrompt });
 
 		//const messages: Message[] = [{ role: "user", content: this.summary }];
 
 		const messages: Message[] = [
 			{
-				role: 'system',
+				role: "system",
 				content: `
           You have memory from the previous conversation summarized below. 
           However, you must answer ONLY the latest user question directly, 
@@ -183,22 +185,22 @@ export class AiController {
       `.trim(),
 			},
 			{
-				role: 'user',
+				role: "user",
 				content: this.summary,
 			},
 			{
-				role: 'user',
+				role: "user",
 				content: userPrompt,
 			},
 		];
 
-		console.log('AI Summary:', this.summary);
+		console.log("AI Summary:", this.summary);
 
 		const response = await this.openai.chat.completions.create({
 			model: this.model,
 			messages,
 		});
 
-		return response.choices[0]?.message?.content || '';
+		return response.choices[0]?.message?.content || "";
 	}
 }

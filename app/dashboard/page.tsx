@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import PageNav from "@/components/page-nav";
-import { Bot, Check, Copy, ExternalLink, LayoutDashboard, List, Plus } from "lucide-react";
+import { Bot, Check, Copy, ExternalLink, LayoutDashboard, List, MessageSquare, Plus } from "lucide-react";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { SheetDrawer } from "@/components/sheet-drawer";
@@ -19,10 +19,10 @@ import { useRouter } from "next/navigation";
 import * as React from "react";
 import EditPropertyForm from "@/components/edit-property";
 import { IRRBarChart } from "@/components/bar-chart2";
-import { UnitsVsIncomeChart } from "@/components/bar-chart3";
 import { RentIncreaseChart } from "@/components/bar-chart4";
 import PurchaseVsSaleChart from "@/components/bar-chart5";
 import { TimelineChart } from "@/components/time-chart";
+import { PopoverQuestions } from "@/components/popover-questions";
 
 type Chat = {
 	q: string;
@@ -79,8 +79,6 @@ export default function Dashboard() {
 				(async () => {
 					await getUser(encodeURIComponent(user.sub as string));
 				})();
-			} else {
-				router.push("/");
 			}
 		}
 	}, [user, getUser, isLoading, router]);
@@ -91,6 +89,11 @@ export default function Dashboard() {
 
 	const selectProperty = (deal: Deal) => {
 		setSelectedPropertyId(deal.id);
+	};
+
+	const sampleQuestion = async (question: string) => {
+		setText(question);
+		await askAi(question);
 	};
 
 	const askAi = async (text: string) => {
@@ -125,10 +128,10 @@ export default function Dashboard() {
 		}
 	};
 
-	// Return nothing if not logged in
-	if (isLoading || !user) {
-		return null;
-	}
+	// // Return nothing if not logged in
+	// if (isLoading || !user) {
+	// 	return null;
+	// }
 
 	return (
 		<>
@@ -177,7 +180,24 @@ export default function Dashboard() {
 						)}
 
 						{view !== VIEWS.detail && (
-							<p className="bg-purple-50 text-teal-700 px-4 py-2 rounded-md border">Querying All Properties</p>
+							<>
+								<div className={"flex"}>
+									<Button
+										onClick={() => sampleQuestion("Which property has the highest IRR so far?")}
+										variant="outline"
+										size="sm"
+									>
+										<MessageSquare />
+										Which property has the highest IRR so far?
+									</Button>
+								</div>
+								<div className={"flex justify-between gap-2"}>
+									<p className="bg-purple-50 w-full text-teal-700 px-4 py-2 rounded-md border">
+										Querying All Properties
+									</p>
+									<PopoverQuestions question={(text: string) => sampleQuestion(text)} />
+								</div>
+							</>
 						)}
 						<Textarea
 							placeholder="Type your message here."
@@ -200,7 +220,7 @@ export default function Dashboard() {
 
 				<div
 					id={"deals-dashboard"}
-					className="w-3/4 p-6 bg-background h-[calc(100vh-84px)] overflow-y-auto min-w-[350px]"
+					className="w-full p-6 bg-background h-[calc(100vh-84px)] overflow-y-auto min-w-[350px]"
 				>
 					<div className="mb-8 flex items-center justify-start gap-4 flex-wrap">
 						{view === VIEWS.property_list && (
@@ -427,7 +447,7 @@ export default function Dashboard() {
 							</div>
 							<div className="grid grid-cols-1 gap-4 mt-6">
 								<IRRBarChart properties={deals} />
-								<UnitsVsIncomeChart data={deals} />
+								{/*<UnitsVsIncomeChart data={deals} />*/}
 								<RentIncreaseChart data={deals} />
 								<PurchaseVsSaleChart properties={deals} />
 								<TimelineChart properties={deals} />

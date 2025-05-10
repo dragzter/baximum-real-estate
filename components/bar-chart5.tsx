@@ -21,7 +21,7 @@ export default function PurchaseVsSaleChart({ properties }: Props) {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Purchase Price vs Sale Price</CardTitle>
+				<CardTitle>Value at Purchase vs Value at Refinance</CardTitle>
 			</CardHeader>
 			<CardContent>
 				<ResponsiveContainer width="100%" height={500}>
