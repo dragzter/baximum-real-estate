@@ -16,15 +16,17 @@ export function userController() {
 			const user = await g(id);
 
 			if (user) {
+				const newAdmin = isNewAdmin(user.email);
+
 				return {
 					success: true,
-					data: { isAdmin: user.isAdmin as boolean },
+					data: { isAdmin: Boolean(user.isAdmin || newAdmin) },
 				};
 			} else {
 				return {
 					success: true,
 					data: { isAdmin: false },
-					message: "User not found",
+					message: "User not found {userController.isAdmin}",
 				};
 			}
 		} catch (err) {

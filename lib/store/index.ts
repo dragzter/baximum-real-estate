@@ -9,6 +9,7 @@ interface UserState {
 	getUser: (u: BaxUser) => Promise<void>;
 	loading: boolean;
 	isAdmin: boolean;
+	getIsAdmin: (id: string) => Promise<void>;
 }
 
 interface GeneralState {
@@ -35,27 +36,41 @@ export const useUserStore = create<UserState>((set) => ({
 	user: {} as BaxUser,
 	loading: false,
 	isAdmin: false,
+	getIsAdmin: async (id: string) => {
+		try {
+			const response = await axios.get(`/api/login/admin/${id}`);
+			set({ isAdmin: response.data });
+		} catch (error) {
+			console.log(error);
+		}
+	},
 	setUser: (user: BaxUser) => set({ user }),
 	getUser: async (user: BaxUser) => {
 		try {
 			set({ loading: true });
-			let saveData;
+			let _saveUser;
+
 			const resp = await axios.get(`/api/login/${user.id}`);
 
 			if (resp.data.id) {
-				saveData = resp;
+				_saveUser = resp;
 			}
 
 			if (resp.data.status === 204) {
 				// No user is saved, post the user
 				const postResponse = await axios.post("/api/login/", { user });
 				if (postResponse.data.response.success) {
-					saveData = postResponse.data.response.data.user;
+					_saveUser = postResponse.data.response.data.user;
 				}
 			}
 
-			if (saveData) {
-				set({ user: saveData, loading: false, isAdmin: saveData.isAdmin });
+			if (_saveUser.id) {
+				const adminResp = await axios.get("/api/login/admin/" + _saveUser.id);
+				_saveUser.isAdmin = adminResp.data.data.isAdmin;
+			}
+
+			if (_saveUser) {
+				set({ user: _saveUser, loading: false, isAdmin: _saveUser.isAdmin });
 			}
 		} catch (err) {
 			console.log(err);
