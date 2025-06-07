@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { useUser } from '@auth0/nextjs-auth0/client';
-import { useRouter } from 'next/navigation';
-import { useUserStore } from '@/lib/store';
-import { useEffect } from 'react';
+import { useUser } from "@auth0/nextjs-auth0/client";
+import { useRouter } from "next/navigation";
+import { useUserStore } from "@/lib/store";
+import { useEffect } from "react";
+import { BaxUser } from "@/lib/types";
 
 export default function Profile() {
 	const { user, isLoading } = useUser();
@@ -14,10 +15,10 @@ export default function Profile() {
 		if (!isLoading) {
 			if (user?.sub) {
 				(async () => {
-					await getUser(encodeURIComponent(user.sub as string));
+					await getUser(user as unknown as BaxUser);
 				})();
 			} else {
-				router.push('/');
+				router.push("/");
 			}
 		}
 	}, [user, getUser, isLoading, router]);
@@ -25,5 +26,5 @@ export default function Profile() {
 	if (isLoading || !user) {
 		return null;
 	}
-	return 'Profile page';
+	return "Profile page";
 }

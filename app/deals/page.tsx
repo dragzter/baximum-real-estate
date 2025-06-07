@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import PageNav from '@/components/page-nav';
-import { useUser } from '@auth0/nextjs-auth0/client';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useUserStore } from '@/lib/store';
+import PageNav from "@/components/page-nav";
+import { useUser } from "@auth0/nextjs-auth0/client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useUserStore } from "@/lib/store";
+import { BaxUser } from "@/lib/types";
 
 export default function Deals() {
 	const { user, isLoading } = useUser();
@@ -15,10 +16,10 @@ export default function Deals() {
 		if (!isLoading) {
 			if (user?.sub) {
 				(async () => {
-					await getUser(encodeURIComponent(user.sub as string));
+					await getUser(user as unknown as BaxUser);
 				})();
 			} else {
-				router.push('/');
+				router.push("/");
 			}
 		}
 	}, [user, getUser, isLoading, router]);
@@ -30,10 +31,7 @@ export default function Deals() {
 	return (
 		<>
 			<PageNav />
-			<div
-				id="properties-list"
-				className="p-6 flex flex-col h-[calc(100vh-84px)] min-w-[400px]"
-			>
+			<div id="properties-list" className="p-6 flex flex-col h-[calc(100vh-84px)] min-w-[400px]">
 				<div className="flex flex-col h-full w-full">Deals table here</div>
 			</div>
 		</>
