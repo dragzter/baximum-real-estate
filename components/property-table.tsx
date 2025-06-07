@@ -365,7 +365,7 @@ export function PropertyTable({ properties, handleEditProperty }) {
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</div>
-			<div className="rounded-md border h-[calc(100vh-340px)] overflow-auto">
+			<div className="rounded-md border h-[calc(100vh-340px)] position-relative overflow-auto">
 				<Table className="min-h-full h-full">
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -375,8 +375,8 @@ export function PropertyTable({ properties, handleEditProperty }) {
 										key={header.id}
 										className={
 											header.id === "actions"
-												? "sticky right-0 z-10 bg-stone-50 border-l border-gray-200"
-												: "border-l border-gray-200"
+												? "sticky top-0 right-0 z-10 bg-stone-50 border-l border-gray-200"
+												: "sticky top-0 z-10 bg-stone-50 border-l border-gray-200"
 										}
 									>
 										{header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}

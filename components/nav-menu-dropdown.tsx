@@ -14,11 +14,16 @@ import { Glasses, House, Loader2, LogIn, LogOut, Plus, Radar, User } from "lucid
 import { useGeneralAppStateStore, useUserStore } from "@/lib/store";
 import Link from "next/link";
 import { VIEWS } from "@/lib/utils";
+import { useEffect } from "react";
 
 export function NavMenuDropdown() {
 	const _user = useUserStore((s) => s.user);
 	const loading = useUserStore((s) => s.loading);
 	const setView = useGeneralAppStateStore((s) => s.setView);
+
+	useEffect(() => {
+		console.log(_user, "USER");
+	}, [_user]);
 
 	return (
 		<DropdownMenu>
@@ -47,7 +52,7 @@ export function NavMenuDropdown() {
 						<Radar className={`h-4 w-4`} /> Dashboard
 					</DropdownMenuItem>
 
-					{Object.keys(_user).length > 0 && (
+					{Object.keys(_user).length > 0 && _user.isAdmin && (
 						<DropdownMenuItem style={{ cursor: "pointer" }} onClick={() => setView(VIEWS.add_property)}>
 							<Plus /> Add Property
 						</DropdownMenuItem>
