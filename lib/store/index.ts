@@ -6,7 +6,7 @@ import { VIEWS } from "@/lib/utils";
 interface UserState {
 	user: BaxUser;
 	setUser: (u: BaxUser) => void;
-	getUser: (id: string) => Promise<void>;
+	getUser: (u: BaxUser) => Promise<void>;
 	loading: boolean;
 	isAdmin: boolean;
 }
@@ -36,12 +36,27 @@ export const useUserStore = create<UserState>((set) => ({
 	loading: false,
 	isAdmin: false,
 	setUser: (user: BaxUser) => set({ user }),
-	getUser: async (id: string) => {
+	getUser: async (user: BaxUser) => {
 		try {
 			set({ loading: true });
-			const resp = await axios.get(`/api/login/${id}`);
+			let saveData;
+			const resp = await axios.get(`/api/login/${user.id}`);
 
-			set({ user: resp?.data, loading: false, isAdmin: resp.data.isAdmin });
+			if (resp.data.id) {
+				saveData = resp;
+			}
+
+			if (resp.data.status === 204) {
+				// No user is saved, post the user
+				const postResponse = await axios.post("/api/login/", { user });
+				if (postResponse.data.response.success) {
+					saveData = postResponse.data.response.data.user;
+				}
+			}
+
+			if (saveData) {
+				set({ user: saveData, loading: false, isAdmin: saveData.isAdmin });
+			}
 		} catch (err) {
 			console.log(err);
 		} finally {

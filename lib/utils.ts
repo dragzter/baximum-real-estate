@@ -139,5 +139,3 @@ export function buildPostDataForAddProperty(values: z.infer<typeof formSchema>, 
 		unstabilized_projected_income: values.unstabilized_projected_income,
 	};
 }
-
-export const ADMIN_LIST = process.env.NEXT_PUBLIC_ADMIN_LIST?.split(",");

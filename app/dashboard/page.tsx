@@ -8,7 +8,7 @@ import { Bot, Check, Copy, ExternalLink, LayoutDashboard, List, MessageSquare, P
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { SheetDrawer } from "@/components/sheet-drawer";
-import { Deal } from "@/lib/types";
+import { BaxUser, Deal } from "@/lib/types";
 import { PropertyTable } from "@/components/property-table";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { useDealsStore, useGeneralAppStateStore, useUserStore } from "@/lib/store";
@@ -77,7 +77,7 @@ export default function Dashboard() {
 		if (!isLoading) {
 			if (user?.sub) {
 				(async () => {
-					await getUser(encodeURIComponent(user.sub as string));
+					await getUser(user as unknown as BaxUser);
 				})();
 			}
 		}

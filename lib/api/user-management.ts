@@ -1,6 +1,6 @@
-import connect from '@/lib/db/connect';
-import { UserModel } from '@/lib/db/models';
-import { ApiResponse, BaxUser } from '@/lib/types';
+import connect from "@/lib/db/connect";
+import { UserModel } from "@/lib/db/models";
+import { ApiResponse, BaxUser } from "@/lib/types";
 
 export function userController() {
 	async function _c() {
@@ -24,7 +24,7 @@ export function userController() {
 				return {
 					success: true,
 					data: { isAdmin: false },
-					message: 'User not found',
+					message: "User not found",
 				};
 			}
 		} catch (err) {
@@ -36,7 +36,7 @@ export function userController() {
 	}
 
 	function isNewAdmin(userEmail: string) {
-		return process.env.NEXT_PUBLIC_ADMIN_LIST?.split(',').includes(userEmail) || false;
+		return process.env.ADMIN_LIST?.split(",").includes(userEmail) || false;
 	}
 
 	async function su(user: BaxUser): Promise<ApiResponse<{ user: BaxUser }>> {
@@ -46,7 +46,7 @@ export function userController() {
 			const existingUser = await g(user.sub);
 
 			if (existingUser) {
-				console.log('existing user: ', existingUser);
+				console.log("existing user: ", existingUser);
 				return {
 					success: true,
 					data: { user: existingUser },
@@ -81,7 +81,6 @@ export function userController() {
 
 	async function g(id: string): Promise<BaxUser | null> {
 		await _c();
-
 		return (await UserModel.findOne({ id }).lean().exec()) as unknown as BaxUser | null;
 	}
 

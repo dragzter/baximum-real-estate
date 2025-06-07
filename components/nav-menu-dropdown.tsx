@@ -52,7 +52,7 @@ export function NavMenuDropdown() {
 						<Radar className={`h-4 w-4`} /> Dashboard
 					</DropdownMenuItem>
 
-					{Object.keys(_user).length > 0 && _user.isAdmin && (
+					{_user && Object.keys(_user).length > 0 && _user.isAdmin && (
 						<DropdownMenuItem style={{ cursor: "pointer" }} onClick={() => setView(VIEWS.add_property)}>
 							<Plus /> Add Property
 						</DropdownMenuItem>
@@ -66,7 +66,7 @@ export function NavMenuDropdown() {
 				<DropdownMenuSeparator />
 
 				<DropdownMenuItem>
-					{Object.keys(_user).length > 0 ? (
+					{_user && Object.keys(_user).length > 0 ? (
 						<Link href="/api/auth/logout" prefetch={false} replace className="flex items-center gap-2">
 							<LogOut className="h-4 w-4" />
 							Log Out
