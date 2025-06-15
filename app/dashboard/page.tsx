@@ -45,6 +45,7 @@ export default function Dashboard() {
 	const router = useRouter();
 	const deals = useDealsStore((s) => s.properties);
 	const isAdmin = useUserStore((s) => s.isAdmin);
+	const isInvestor = useGeneralAppStateStore((s) => s.investor);
 
 	const getProperties = useDealsStore((s) => s.getProperties);
 
@@ -72,6 +73,12 @@ export default function Dashboard() {
 		setEditPropertyAddress(deal.address);
 		setView(VIEWS.update_property);
 	};
+
+	useEffect(() => {
+		if (!isInvestor) {
+			router.push("/");
+		}
+	}, [isInvestor, router]);
 
 	useEffect(() => {
 		if (!isLoading) {
@@ -129,9 +136,9 @@ export default function Dashboard() {
 	};
 
 	// // Return nothing if not logged in
-	// if (isLoading || !user) {
-	// 	return null;
-	// }
+	if (!isInvestor) {
+		return null;
+	}
 
 	return (
 		<>

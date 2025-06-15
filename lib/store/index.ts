@@ -15,6 +15,8 @@ interface UserState {
 interface GeneralState {
 	isDashboard: boolean;
 	setIsDashboard: (b: boolean) => void;
+	investor: boolean;
+	setIsInvestor: (s: boolean) => void;
 	view: (typeof VIEWS)[keyof typeof VIEWS];
 	setView: (s: (typeof VIEWS)[keyof typeof VIEWS]) => void;
 }
@@ -83,6 +85,8 @@ export const useUserStore = create<UserState>((set) => ({
 export const useGeneralAppStateStore = create<GeneralState>((set) => ({
 	isDashboard: false,
 	view: VIEWS.dashboard,
+	investor: false,
+	setIsInvestor: (s: boolean) => set({ investor: s }),
 	setIsDashboard: (s: boolean) => set({ isDashboard: s }),
 	setView: (s: (typeof VIEWS)[keyof typeof VIEWS]) => set({ view: s }),
 }));

@@ -4,12 +4,13 @@ import PageNav from "@/components/page-nav";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useUserStore } from "@/lib/store";
+import { useGeneralAppStateStore, useUserStore } from "@/lib/store";
 import { BaxUser } from "@/lib/types";
 
 export default function Deals() {
 	const { user, isLoading } = useUser();
 	const router = useRouter();
+	const isInvestor = useGeneralAppStateStore((s) => s.investor);
 	const getUser = useUserStore((s) => s.getUser);
 
 	useEffect(() => {
@@ -24,7 +25,7 @@ export default function Deals() {
 		}
 	}, [user, getUser, isLoading, router]);
 
-	if (isLoading || !user) {
+	if (isLoading || !user || !isInvestor) {
 		return null;
 	}
 
