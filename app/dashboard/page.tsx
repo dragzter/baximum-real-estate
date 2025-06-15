@@ -145,7 +145,7 @@ export default function Dashboard() {
 			<PageNav />
 
 			<div className="flex">
-				<div id="main-dashboard" className="w-1/4 p-6 border-r flex flex-col h-[calc(100vh-84px)] min-w-[400px]">
+				<div id="main-dashboard" className="w-1/4 p-6 border-r flex flex-col h-[calc(100vh-84px)] min-w-[360px]">
 					<div className="flex flex-col h-full w-full gap-2 ">
 						<div id="ai-response-container" className="flex flex-col-reverse overflow-y-auto flex-1 gap-2 mb-2">
 							{chats.map((chat, index) => (

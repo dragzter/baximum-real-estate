@@ -138,3 +138,13 @@
 .rdp-dropdown_year > div[aria-hidden="true"] {
   display: none !important;
 }
+
+@media (max-width: 991px) {
+  #deals-dashboard {
+    display: none !important;
+  }
+  
+  #main-dashboard {
+    width: 100% !important;
+  }
+}
